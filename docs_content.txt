@@ -1,0 +1,1038 @@
+=== SRS ===
+CI/CD PIPELINE FOR AN IT SERVICE DESK PORTAL
+Week 3 Deliverable
+Software Requirements Specification (SRS)
+Course / Subject
+[Course Name / Code — e.g., B.E. Computer Engineering, Semester VII — Project Work I]
+Project Title
+CI/CD Pipeline for an IT Service Desk Portal
+Team Members
+[Student Name 1 — Roll No.]
+[Student Name 2 — Roll No.]
+[Student Name 3 — Roll No.]
+[Student Name 4 — Roll No.]
+Project Guide / Faculty
+[Faculty Guide Name, Designation]
+Department
+[Department of Computer Engineering]
+Institution
+[Institution / College Name]
+Academic Year
+[20XX – 20XX]
+Document Version
+1.0 (Week 3 Submission)
+Submission Date
+[DD / MM / YYYY]
+Document Control
+Field
+Value
+Version
+1.0
+Date
+[DD / MM / YYYY]
+Prepared By
+[Project Team — Student Names]
+Reviewed By
+[Faculty Guide Name]
+Status
+Draft — submitted for Week 3 academic evaluation
+This SRS builds directly upon the Week 1 Problem Definition and Scope document and the Week 2 Agile Planning and DevOps Workflow document. It does not redefine project scope; it formalises the MVP, user stories, and acceptance criteria already established into a structured requirements specification, prior to the start of implementation.
+1. Introduction
+1.1 Purpose
+The purpose of this document is to specify, in a structured and verifiable form, what the IT Service Desk Portal must do. It defines the system's functional and non-functional requirements, business rules, data requirements, and interface expectations, so that development (beginning in the weeks following this document) proceeds against a shared, unambiguous definition of the required behaviour. This SRS describes WHAT the system must do; it deliberately does not describe HOW the system will be built — detailed software architecture, database schema design, and deployment/infrastructure architecture are addressed in separate documents later in the project.
+1.2 Scope
+This SRS covers the IT Service Desk Portal application only — the ticket-management web application used by Employees, IT Support Staff, and Administrators. It does not specify requirements for the DevOps/CI-CD pipeline (Git/GitHub workflow, Jenkins pipeline stages, Selenium test design, Docker image structure, or Ansible/Puppet configuration); those remain governed by the DevOps workflow defined in the Week 2 document and will be elaborated in their own technical design documents. The application requirements documented here are limited to the MVP feature set established in Week 1: ticket creation, viewing, updating, and searching; a role-based ticket status workflow; and a summary dashboard.
+1.3 Intended Audience
+The project team (developers, tester, DevOps-responsible member, database/API-responsible member, project coordinator), as the primary implementers of this specification.
+The project guide/faculty, for evaluation of requirement completeness, clarity, and testability.
+Any future reader of the project documentation seeking to understand what the IT Service Desk Portal is required to do, independent of how it was implemented.
+1.4 Definitions and Terminology
+Term
+Definition
+Ticket
+A record created by an Employee describing a single IT issue, tracked through the system until resolution and closure.
+MVP
+Minimum Viable Product — the smallest set of features defined in the Week 1 scope document required for the portal to be meaningfully usable.
+FR
+Functional Requirement — a specific, testable behaviour the system must perform, identified with a unique ID (e.g., FR-01).
+NFR
+Non-Functional Requirement — a quality attribute (e.g., performance, security) the system must satisfy, identified with a unique ID (e.g., NFR-01).
+Role
+One of the three access levels supported by the system: Employee, IT Support Staff, or Administrator.
+Status / Workflow State
+The current stage of a ticket's lifecycle, such as Open, Assigned, In Progress, Resolved, or Closed.
+Stakeholder
+Any party with an interest in the system, as identified in the Week 1 stakeholder table.
+1.5 References / Assumptions
+Week 1 — Problem Definition and Scope Document (problem statement, stakeholders, objectives, in-/out-of-scope items, MVP definition).
+Week 2 — Agile Planning and DevOps Workflow Document (user stories US-01–US-12, acceptance criteria, product backlog PB-01–PB-15, DevOps lifecycle).
+This SRS assumes those two documents remain the authoritative source of project scope; where this document elaborates a requirement (for example, the addition of an explicit "Assigned" workflow state — see Section 3.3), it does so as a refinement within the existing MVP boundary, not as new scope.
+2. Overall Description
+2.1 Product Perspective
+The IT Service Desk Portal is a new, standalone web application; it does not replace or integrate with any existing enterprise ticketing system. It is developed as the application component of a larger academic project whose primary learning objective is the surrounding CI/CD pipeline. The portal is self-contained: it manages its own users, tickets, and categories, and does not depend on external systems such as Active Directory, email servers, or third-party helpdesk platforms.
+2.2 Product Functions
+At a high level, the system provides the following functions, each elaborated into detailed functional requirements in Section 3:
+User authentication and role-based access control.
+Creation, viewing, updating, and searching of IT support tickets.
+A defined ticket status workflow with role-restricted transitions.
+A summary dashboard presenting aggregated ticket metrics.
+Administrative management of user accounts.
+2.3 User Classes
+User Class
+Description
+Technical Expertise Expected
+Employee
+General staff member who raises tickets for IT issues encountered during their work and tracks their own tickets.
+Basic computer literacy; no technical/IT background assumed.
+IT Support Staff
+Handles the ticket queue: investigates, updates status, and resolves tickets raised by Employees.
+Working technical familiarity with common IT issues; comfortable with web applications.
+Administrator
+Oversees the system: manages user accounts, has full ticket visibility, and monitors the dashboard.
+Highest familiarity with the system as a whole; may also perform IT Support Staff duties.
+2.4 Operating Environment
+The system is a web application accessed through a standard desktop or laptop web browser; no native mobile application is in scope (as per the Week 1 out-of-scope list).
+The application is expected to run on a single server/virtual machine environment suitable for an academic deployment, and — from the relevant project week onward — inside a Docker container as defined by the DevOps workflow.
+The exact runtime platform, programming language, and framework are implementation decisions to be finalised in the technical design phase and are outside the scope of this document.
+2.5 Constraints
+The system must be implementable by a small student team within the remaining academic weeks of a 15-week project.
+Only free or open-source technologies may be used, consistent with the Week 1 resource constraint.
+The application must be compatible with containerisation via Docker and automated testing via Selenium, since both are required later in the project timeline.
+2.6 Assumptions
+A single hypothetical organisation is assumed as the operating context, consistent with the Week 1 assumptions; the system is not being built for a real, live organisation.
+Users are provisioned with accounts by an Administrator; self-registration by Employees is not assumed to be in scope unless specified otherwise in a later design document.
+Network connectivity between users and the hosted application is assumed to be available and is not itself a system requirement.
+2.7 Dependencies
+The application's testability depends on the automated Selenium test cases planned in the Week 2 backlog (PB-10), which in turn depend on the functional requirements in this document being stable before test scripts are written.
+The application's deployment depends on the Docker and Ansible/Puppet work planned for later weeks (PB-11–PB-13); this SRS assumes that dependency but does not specify it further.
+3. Functional Requirements
+Each functional requirement below is assigned a unique ID and written to be independently testable. Requirements are grouped by feature area, consistent with the MVP defined in Week 1.
+3.1 Authentication
+ID
+Requirement
+Description
+FR-01
+Login
+The system shall allow a registered user to log in by providing a valid username and password, and shall deny access with a clear error message when credentials are invalid.
+FR-02
+Logout
+The system shall allow a logged-in user to log out, terminating their active session so that further access requires re-authentication.
+FR-03
+Role-Based Access
+The system shall determine, at login, the user's role (Employee, IT Support Staff, or Administrator) and shall restrict visible features and data to those permitted for that role, as defined in Section 6 (Business Rules).
+3.2 Ticket Management
+ID
+Requirement
+Description
+FR-04
+Create Ticket
+The system shall allow a logged-in Employee to create a new ticket by supplying, at minimum, a title, description, and category. The system shall generate a unique ticket ID and set the initial status to "Open" automatically upon creation.
+FR-05
+View Ticket
+The system shall allow a user to view a list of tickets scoped to their role (Employee: own tickets; IT Support Staff: the shared/assigned queue; Administrator: all tickets) and to open an individual ticket to view its full detail, including status history and resolution notes.
+FR-06
+Update Ticket
+The system shall allow IT Support Staff and Administrators to update a ticket's status (per the workflow in Section 3.3) and to add resolution notes. The system shall record the date and time of each update.
+FR-07
+Search Ticket
+The system shall allow a user to search or filter the ticket list visible to their role by keyword (matching title/description), status, and category, returning matching results without requiring an exact match on the full title.
+3.3 Ticket Workflow
+The ticket status lifecycle is refined at this stage to include an explicit "Assigned" state between "Open" and "In Progress," so that ticket ownership is unambiguous before work begins. This refinement adds clarity within the workflow already introduced in Week 1/Week 2 and does not alter the MVP scope. The defined lifecycle is:
+Open → Assigned → In Progress → Resolved → Closed
+State
+Meaning
+Open
+The ticket has been created by an Employee and has not yet been assigned to an IT Support Staff member.
+Assigned
+The ticket has been taken up by (or assigned to) a specific IT Support Staff member, but work has not yet actively started.
+In Progress
+The assigned IT Support Staff member is actively working on the ticket.
+Resolved
+The IT Support Staff member has completed the required work and recorded resolution notes; the ticket awaits closure.
+Closed
+The ticket is confirmed complete and requires no further action.
+ID
+Transition
+Who Can Perform It
+Condition
+FR-08
+Open → Assigned
+IT Support Staff, Administrator
+A ticket in the shared queue is taken up by an IT Support Staff member, or explicitly assigned by an Administrator.
+FR-09
+Assigned → In Progress
+IT Support Staff (the assignee)
+The assigned staff member begins active work on the ticket.
+FR-10
+In Progress → Resolved
+IT Support Staff (the assignee)
+Resolution notes describing the action taken must be recorded before the transition is permitted.
+FR-11
+Resolved → Closed
+IT Support Staff, Administrator
+The resolution is confirmed as satisfactory; no further employee action is required.
+FR-12
+Any state → Assigned (reassignment)
+Administrator
+An Administrator may reassign a ticket, for example when the original assignee is unavailable, as permitted under the Week 1/2 Administrator role.
+The system shall not permit a status transition that is not explicitly listed above (for example, moving a ticket directly from "Open" to "Closed"), so that the recorded workflow accurately reflects how the ticket was actually handled.
+3.4 Dashboard
+ID
+Requirement
+Description
+FR-13
+Ticket Count by Status
+The system shall display, on a summary dashboard, the count of tickets currently in each status (Open, Assigned, In Progress, Resolved, Closed).
+FR-14
+Ticket Count by Category
+The system shall display the count of tickets by category (e.g., Hardware, Software, Network, Access) on the dashboard.
+FR-15
+Dashboard Access
+The system shall make the dashboard available to IT Support Staff and Administrators; the dashboard is not required to be available to the Employee role.
+FR-16
+Dashboard Currency
+The dashboard shall reflect the current state of ticket data at the time it is viewed, without requiring a separate manual data-refresh action by the user.
+4. Non-Functional Requirements
+Non-functional requirements describe quality attributes the system must satisfy, stated in measurable terms wherever practical for a student-project context.
+ID
+Category
+Requirement
+NFR-01
+Performance
+Under normal single-user testing conditions, common actions (login, ticket creation, ticket list retrieval) shall complete within 3 seconds on the target development/demo environment.
+NFR-02
+Security
+Passwords shall not be stored or displayed in plain text; access to ticket data shall be restricted according to the role-based rules in Section 6.
+NFR-03
+Usability
+A first-time Employee user shall be able to create a ticket without external instructions, using clearly labelled fields and a visible confirmation upon submission.
+NFR-04
+Reliability
+The system shall not lose a successfully submitted ticket; once a creation or update action is confirmed to the user, the corresponding data shall be persisted.
+NFR-05
+Maintainability
+The application shall be structured so that a new ticket category or status label can be added by modifying configuration/data rather than requiring changes across multiple unrelated components.
+NFR-06
+Scalability
+The system shall support at least the number of concurrent users realistic for a small-organisation academic demonstration (a working assumption of approximately 20–30 registered users) without requiring architectural change.
+NFR-07
+Availability
+During scheduled demonstration and evaluation sessions, the deployed instance shall be accessible, excluding planned maintenance or environment restarts communicated in advance to the team.
+NFR-08
+Compatibility
+The web application shall function correctly on at least one current, widely used desktop browser (e.g., a recent version of Chrome or Firefox), as further defined in Section 7.4.
+5. User Requirements
+This section restates the system's requirements from each user role's own point of view, in plain language, complementing the formal functional requirements in Section 3.
+5.1 Employee Perspective
+I need to log in securely and see only my own tickets.
+I need to report an IT issue quickly, without needing to know technical categorisation details beyond a simple category list.
+I need to check the status of a ticket I previously raised without contacting IT support directly.
+I need to find a specific past ticket without scrolling through my entire history.
+5.2 IT Support Staff Perspective
+I need a clear view of tickets that are open or assigned to me, so I know what requires attention.
+I need to update a ticket's status and record what I did, so there is a record of my work.
+I need to search or filter tickets by category to identify related or duplicate issues.
+5.3 Administrator Perspective
+I need full visibility of all tickets in the system, regardless of who raised or is handling them.
+I need to manage user accounts so that access to the system is controlled.
+I need a dashboard summary so that I can assess overall ticket volume and category trends without reviewing every ticket individually.
+I need the ability to reassign a ticket when the original assignee cannot complete it.
+6. Business Rules
+BR — Required Ticket Fields
+A ticket cannot be created without a title, a description, and a category; the system shall reject submission of a ticket missing any of these fields.
+BR — Valid Status Transitions
+A ticket may only move between statuses along the transitions defined in Section 3.3 (FR-08 to FR-12); any other transition is invalid and shall be rejected.
+A ticket cannot be marked "Resolved" without accompanying resolution notes.
+BR — Role Permissions
+An Employee may create tickets and view/search only their own tickets; they may not update ticket status or view other Employees' tickets.
+IT Support Staff may view, search, and update tickets in the shared/assigned queue; they may not manage user accounts.
+An Administrator has all permissions available to IT Support Staff, plus user account management and the ability to reassign or close any ticket.
+BR — Search Behaviour
+Search shall match on partial text within the ticket title or description (not exact match only) and shall respect the same role-based visibility rules as ticket viewing — a user cannot search their way into seeing tickets they are not permitted to view.
+Search results may be further narrowed by status and/or category filters, applied in combination with the keyword search.
+7. External Interface Requirements
+7.1 User Interface Requirements
+The system shall provide a web-based graphical user interface accessible via a standard browser; no command-line interface is required.
+The interface shall present role-appropriate navigation — an Employee shall not see menu items or controls for functions they are not permitted to use (e.g., user management).
+Forms (such as ticket creation) shall provide visible validation feedback when a required field is missing or invalid.
+7.2 API / Interface Expectations
+The application is expected to expose an internal interface (e.g., a web API) between its user interface and its business logic/data layer, sufficient to support the functional requirements above and to allow the automated Selenium tests planned in the Week 2 backlog to exercise the application's workflows. The specific technology and API design are implementation decisions for the technical design phase and are not fixed by this SRS.
+7.3 Database Interaction Expectations
+The system is expected to persist ticket, user, and category data in a backing data store such that data survives an application restart. The specific database technology and schema are outside the scope of this document and will be addressed in a separate database design document; this SRS defines only the data content expected to be stored (see Section 8).
+7.4 Browser Requirements
+The application shall be usable on at least one current desktop browser (e.g., a recent version of Google Chrome or Mozilla Firefox).
+The application is not required to support legacy browsers or to provide a dedicated mobile-optimised interface, consistent with the Week 1 out-of-scope decision on native mobile applications.
+8. Data Requirements
+This section describes the information a ticket record must contain, at the level of a data dictionary. It does not define the database schema, table structure, or storage technology — these are addressed separately in the project's database design work.
+Field
+Description
+Ticket ID
+A unique identifier automatically generated by the system when a ticket is created.
+Title
+A short, user-supplied summary of the issue, required at creation.
+Description
+A free-text explanation of the issue, required at creation.
+Category
+A classification of the issue (e.g., Hardware, Software, Network, Access), selected at creation from a defined list.
+Priority
+An indication of urgency (e.g., Low, Medium, High), used to help IT Support Staff order their work.
+Status
+The current workflow state of the ticket, per Section 3.3 (Open, Assigned, In Progress, Resolved, Closed).
+Created Date
+The date and time the ticket was created, recorded automatically by the system.
+Updated Date
+The date and time of the most recent update to the ticket, recorded automatically by the system.
+Created By
+The identity of the Employee who raised the ticket.
+Assigned To
+The identity of the IT Support Staff member currently responsible for the ticket, if assigned.
+Resolution Notes
+Free-text notes recorded by IT Support Staff describing the action taken to resolve the issue.
+9. Security Requirements
+ID
+Requirement
+SR-01
+The system shall require a valid username and password before granting access to any ticket data or role-restricted function.
+SR-02
+Passwords shall be stored in a hashed (non-reversible) form rather than in plain text.
+SR-03
+The system shall enforce role-based access control server-side (not only by hiding UI elements), so that a user cannot access data or actions outside their role by directly requesting a restricted function.
+SR-04
+User sessions shall expire after a period of inactivity, requiring re-authentication.
+SR-05
+The system shall not expose one user's ticket data to another user who is not permitted to view it, as defined in Section 6.
+10. Error Handling Requirements
+ID
+Requirement
+ER-01
+If a user submits a ticket creation form with a missing required field, the system shall reject the submission and clearly indicate which field(s) are missing, without discarding the data already entered.
+ER-02
+If a login attempt fails, the system shall display a generic error message that does not reveal whether the username or the password was incorrect, and shall not lock the interface itself (account lockout policy, if any, is a security decision to be defined in later design work).
+ER-03
+If a user attempts an action outside their role's permissions (e.g., an Employee attempting to update ticket status), the system shall reject the action and display an appropriate access-denied message.
+ER-04
+If an invalid status transition is attempted (Section 3.3), the system shall reject it and inform the user of the ticket's current valid next state(s).
+ER-05
+If the system is unable to persist a ticket creation or update (e.g., due to a backend/database error), the system shall inform the user that the action did not complete, rather than showing a false success confirmation.
+11. Traceability Matrix
+The table below traces each core business objective from the Week 1 scope through its corresponding Week 2 user story, the functional requirement(s) defined in this SRS, and the acceptance criteria that will be used to verify it (as first defined in the Week 2 document, and elaborated here where the workflow was refined).
+Business Objective
+User Story
+Functional Requirement(s)
+Acceptance Criteria Reference
+Employees can report IT issues without informal, untracked communication.
+US-02 — Create ticket
+FR-04
+Ticket created with category and description; unique ID and "Open" status assigned automatically (US-02 AC).
+Employees can check on issues they reported without contacting IT support again.
+US-03 — View own tickets
+FR-05
+Employee views own tickets with ID, category, status, and creation date (US-03 AC).
+IT Support Staff have an organised, shared view of outstanding work.
+US-05 — View ticket queue
+FR-05
+IT Support Staff views open/in-progress tickets with key details (US-05 AC).
+Ticket handling is tracked and accountable as it progresses.
+US-06 — Update status
+FR-06, FR-08–FR-12
+Status changes only via valid transitions; visible to the Employee immediately (US-06 AC).
+Resolution actions are documented for future reference.
+US-07 — Add resolution notes
+FR-06
+Notes are timestamped and retained as part of ticket history (US-07 AC).
+Users can find specific tickets without manually scanning full lists.
+US-04 / US-08 — Search tickets
+FR-07
+Search/filter by keyword, status, or category, scoped to the user's role (Section 6).
+Administrators have full oversight of ticketing activity.
+US-09 — View all tickets
+FR-05
+Administrator views all tickets regardless of creator or assignee (US-09 AC).
+Management/administration can assess workload at a glance.
+US-11 — Summary dashboard
+FR-13, FR-14, FR-16
+Dashboard shows counts by status and category, reflecting current data (US-11 AC).
+Access to the system is controlled and role-appropriate.
+US-01, US-10 — Login; manage users
+FR-01, FR-02, FR-03
+Valid/invalid login handled correctly; user directed per role (US-01 AC).
+12. Out-of-Scope Requirements
+Consistent with the Week 1 scope document, the following are explicitly not required of the system by this SRS:
+Integration with external identity systems (Active Directory/LDAP), single sign-on, or third-party ticketing platforms.
+Formal ITIL-aligned processes such as SLA enforcement, change management, or a configuration management database (CMDB).
+Multi-organisation or multi-tenant support.
+Native mobile applications; only a browser-based responsive-capable web interface is required.
+Advanced analytics, reporting, or automated/ML-based ticket categorisation.
+Real-time chat, SMS notifications, or ticket creation via inbound email.
+Production-grade security certification, penetration testing, or compliance auditing.
+13. Assumptions and Dependencies
+13.1 Assumptions
+User accounts are provisioned by an Administrator rather than through public self-registration, unless a later design document specifies otherwise.
+The set of ticket categories (e.g., Hardware, Software, Network, Access) is a fixed, pre-defined list for the MVP rather than user-configurable.
+A single Administrator role is sufficient for the MVP; multiple tiers of administrative privilege are not assumed.
+13.2 Dependencies
+Automated verification of these requirements depends on the Selenium test cases planned in the Week 2 backlog (PB-10), which should be written against the functional requirements and acceptance criteria in this document.
+Deployment and demonstration of the system in a realistic environment depends on the Docker containerisation and Ansible/Puppet automation planned for later weeks (PB-11–PB-13).
+14. Acceptance Conditions
+This SRS, and the implementation built against it, will be considered acceptable when:
+Every functional requirement in Section 3 has a corresponding, demonstrable behaviour in the implemented application.
+Every High-priority user story from the Week 2 document (US-01, US-02, US-03, US-05, US-06, US-07, US-09, US-11) is satisfied and traceable to at least one functional requirement, per Section 11.
+The role-based access rules in Section 6 are enforced and verified for all three user roles.
+The non-functional requirements in Section 4 are met to the extent measurable in the academic development/demo environment.
+The data fields defined in Section 8 are captured and retained correctly for every created ticket.
+15. Conclusion
+This SRS has translated the problem definition, scope, and Agile backlog established in Weeks 1 and 2 into a structured, testable specification of what the IT Service Desk Portal must do. It defines functional requirements for authentication, ticket management, the ticket status workflow, and the dashboard; non-functional requirements covering performance, security, usability, and related qualities; business rules; data requirements; and a traceability matrix linking business objectives through to acceptance criteria. No implementation has taken place under this document; it establishes the requirement baseline against which the technical design and subsequent development work will proceed.
+Week 3 SRS Deliverables Checklist
+The following items constitute evidence of completion for the Week 3 deliverable, "Software Requirements Specification":
+Document control information completed (version, date, prepared by, reviewed by, status).
+Introduction defining purpose, scope, audience, terminology, and references (Section 1).
+Overall description covering product perspective, functions, user classes, environment, constraints, assumptions, and dependencies (Section 2).
+Functional requirements defined with unique IDs for authentication, ticket management, ticket workflow, and dashboard (Section 3).
+Non-functional requirements defined and made measurable where possible (Section 4).
+User requirements described from Employee, IT Support Staff, and Administrator perspectives (Section 5).
+Business rules defined for required fields, valid transitions, role permissions, and search behaviour (Section 6).
+External interface requirements defined for UI, API, database interaction, and browser support (Section 7).
+Data requirements (ticket data dictionary) defined without prescribing database schema (Section 8).
+Security requirements defined (Section 9).
+Error handling requirements defined (Section 10).
+Traceability matrix completed, linking business objectives to user stories, functional requirements, and acceptance criteria (Section 11).
+Out-of-scope requirements restated for consistency with Week 1 (Section 12).
+Assumptions and dependencies documented (Section 13).
+Acceptance conditions defined (Section 14).
+This Week 3 SRS document submitted in final form.
+
+=== Design ===
+CI/CD PIPELINE FOR AN IT SERVICE DESK PORTAL
+Week 3 Companion Deliverable
+System Design and Technical Architecture Document
+(Companion to the Week 3 Software Requirements Specification — describes HOW the system defined therein will be designed and built)
+Course / Subject
+B.E. Computer Engineering, Semester VII — Project Work I (DevOps Project)
+Class / Division
+BE - VII / Division B
+Project Title
+CI/CD Pipeline for an IT Service Desk Portal
+Document Title
+System Design and Technical Architecture Document
+Student
+Sahil Gawade — Roll No. 24102B2003
+Project Guide / Faculty
+[Faculty Guide Name, Designation]
+Department
+Department of Computer Engineering
+Institution
+[Institution / College Name]
+Academic Year
+2026 – 27 (ODD Semester)
+Document Version
+1.1 (Design Document — revised to align with the official Week 3 task brief for Roll No. 24102B2003)
+Submission Date
+[DD / MM / YYYY]
+Document Control
+Version
+1.1 (revised)
+Date
+[DD / MM / YYYY]
+Prepared By
+Sahil Gawade — Roll No. 24102B2003
+Reviewed By
+[Faculty Guide Name]
+Status
+Draft — issued for Week 3 academic evaluation, alongside the SRS
+Related Documents
+Week 1 — Problem Definition and Scope; Week 2 — Agile Planning and DevOps Workflow; Week 3 — Software Requirements Specification (SRS); Department Project-Task Allocation Sheet (CMPN Sem-7 Div-B) — Roll No. 24102B2003
+Relationship to the SRS. The Week 3 Software Requirements Specification (SRS) defines WHAT the IT Service Desk Portal must do — its functional requirements (FR-01 to FR-20+), non-functional requirements, business rules, and data content. This document does not restate or alter any requirement. It takes the SRS and the MVP established in Week 1 as fixed, authoritative input and defines HOW the system described there will be structured: the technology stack, application architecture, database design, API design, and the DevOps/CI-CD architecture around it. Every design decision in this document traces back to a specific SRS requirement or Week 1/2 scope item; none introduces new functional scope.
+Implementation status. This is a design document. No part of the architecture, codebase, database, or pipeline described here has been implemented at the time of writing. All statements describe planned structure, to be realised during the implementation weeks that follow.
+Revision note (v1.1). This revision aligns the document with the department's official Week 1–15 task-allocation sheet for Roll No. 24102B2003 (Sahil Gawade), Class BE - VII, Division B, project “CI/CD Pipeline for an IT Service Desk Portal.” That sheet's Week-3 task cell explicitly requires selecting “the programming stack, Maven/Gradle/Ant build tool, database if required, Tomcat/Nginx deployment target and local development setup,” and its Week-7 through Week-10 cells confirm a Maven-based Jenkins build job and Maven-executed Selenium suite. The technology stack in Section 3 has therefore been revised from a Node.js/Express backend to a Java/Spring Boot backend built with Maven and deployed to Apache Tomcat, with all downstream sections (architecture, DevOps pipeline, deployment, CI/CD, testing) updated to match. No functional requirement, module, or data element from the SRS has changed as a result of this revision.
+Table of Contents
+(Right-click this area in Word and choose “Update Field” — or press F9 — to populate the table of contents with page numbers.)
+1. System Overview
+The IT Service Desk Portal is a role-based web application through which Employees raise IT support tickets, IT Support Staff work through and resolve those tickets, and an Administrator oversees users, categories, and overall ticket activity, exactly as specified in the SRS (Section 2, Product Perspective and Product Functions). This document defines the technical structure that will realise that specification: a browser-based frontend, a REST API backend, a relational database, and a surrounding DevOps/CI-CD pipeline that builds, tests, containerises, and deploys the application.
+The system is designed as a single, self-contained web application (no integration with external directory services, email systems, or third-party helpdesk platforms — consistent with SRS Section 2.1) and is scoped for a small student team to design, build, and demonstrate over the remaining weeks of a 15-week academic project, using only free and open-source technologies (SRS Section 2.5).
+1.1 Purpose of This Document
+To translate the functional and non-functional requirements defined in the SRS into a concrete, implementable technical design: a chosen technology stack, an application architecture, a database schema at the conceptual level, an API contract, and a DevOps pipeline architecture (Git/GitHub, Jenkins, Selenium, Docker, and Ansible), so that development in subsequent weeks proceeds against a shared, unambiguous design rather than ad-hoc individual decisions.
+1.2 Scope of This Document
+Covers: application architecture, technology selection and justification, module decomposition, database conceptual design, REST API design, ticket lifecycle implementation, security architecture, deployment architecture, and CI/CD pipeline architecture.
+Does not cover: functional requirements (defined in the SRS), sprint-by-sprint task allocation (defined in the Week 2 document), or actual source code, database DDL, or pipeline scripts — these are implementation artefacts produced in later weeks against this design.
+1.3 Design Principles Followed
+Traceability to the SRS: every module and data element maps to a named functional requirement (FR-xx) or data field from SRS Section 8.
+Simplicity over sophistication: a small, coherent set of technologies that a 3–4 person student team can realistically learn, integrate, and operate within the remaining project weeks, in preference to a more “enterprise” but harder-to-manage stack.
+Separation of concerns: presentation (frontend), business logic and API (backend), and persistence (database) are kept as distinct layers, and the DevOps pipeline is kept distinct from application logic.
+Pipeline-readiness: every technology choice is deliberately compatible with Git/GitHub, Jenkins, Selenium, Docker, and Ansible, since these are mandated by the Week 1/2 project brief.
+2. Design Goals
+The following goals guide every architectural decision made in this document. Each goal is drawn directly from the non-functional requirements (NFR-01 to NFR-08) and constraints defined in the SRS.
+Goal
+Design Response
+Traceability
+Correctness against the SRS
+Every module, endpoint, and data field is derived directly from a named FR or data-dictionary entry.
+FR-01–FR-20+, SRS §8
+Simplicity and manageability
+A single, coherent Java stack (Spring Boot backend, Maven build, Tomcat deployment) paired with a plain React frontend, avoiding unnecessary microservices or polyglot complexity, while matching the build tool and deployment target mandated by the project brief.
+SRS §2.5 (student-team constraint); official Week-3 task brief (Roll No. 24102B2003)
+Testability
+A clean separation between UI and API layers so that Selenium can drive the UI end-to-end and the API can be unit/integration tested independently.
+SRS §7.2, NFR dependency on PB-10
+Security by design
+Hashed passwords, server-side role enforcement, session/token expiry, parameterised queries.
+NFR-02, SR-01–SR-05
+Deployability via the mandated pipeline
+All components are containerised with Docker and deployed/configured with Ansible, matching the Week 1/2 tooling brief.
+Week 1 §3.1–3.2, Week 2 §DevOps lifecycle
+Maintainability
+Categories, statuses, and priorities are stored as data, not hard-coded, so new values can be added without code changes across modules.
+NFR-05
+Reasonable performance and scale for an academic demo
+A stateless backend and indexed relational queries sized for ~20–30 concurrent users; no premature scaling infrastructure.
+NFR-01, NFR-06
+3. Technology Stack
+The stack below is chosen to be coherent (few languages/runtimes to learn), free/open-source throughout, and directly compatible with the mandated DevOps tools and deployment target named in the official Week 1–15 task-allocation sheet for this project (Roll No. 24102B2003): a Maven/Gradle/Ant build tool and a Tomcat/Nginx deployment target, alongside GitHub, Jenkins, Selenium, Docker, and Ansible/Puppet. Wherever a simpler alternative would have served equally well within that constraint, the simpler option was preferred over a more “impressive” but harder-to-integrate one.
+3.1 Frontend — React (with Vite) and plain CSS/Bootstrap
+What: A single-page application (SPA) built with React, bundled using Vite, calling the backend over REST/JSON. Bootstrap (or plain CSS) is used for layout and form styling — no heavyweight design system is needed for an MVP UI.
+Why: React is widely taught, well documented, and produces a static build (HTML/CSS/JS bundle) that is trivial to containerise and serve behind Nginx — the exact deployment target named in the task brief. It is built and packaged independently of the backend's Maven build, using its own lightweight npm/Vite toolchain, and the two are wired together only through the REST API contract (Section 10).
+Fit with SRS: satisfies the web-based GUI requirement (§7.1), role-appropriate navigation, and client-side form validation feedback, while all authoritative validation and access control remain server-side (SR-03).
+3.2 Backend — Java 17 with Spring Boot (REST API), built with Maven
+What: A Java 17 backend built on the Spring Boot framework — Spring Web (MVC/REST controllers), Spring Data JPA (persistence over MySQL), and Spring Security (authentication and role-based authorization). The project is built, tested, and packaged as a deployable WAR using Apache Maven.
+Why Java/Spring Boot + Maven: The department's official Week 1–15 task-allocation sheet for this project explicitly requires selecting “a Maven/Gradle/Ant build tool” (Week-3 task) and states that the Jenkins CI job is “a Maven/Gradle/Ant build job” (Week-7) whose Selenium suite is “executed locally through Maven” (Week-9). These three build tools are all part of the Java ecosystem, so the backend language follows from the mandated tooling rather than being chosen independently of it. Among the three, Maven is selected over Gradle and Ant (see Section 3.2.1). Spring Boot is, in turn, the most widely taught and best-documented Java web framework for building a REST API quickly, and it packages naturally as a WAR for deployment to Apache Tomcat — the deployment target the same brief names.
+Fit with SRS: implements FR-01–FR-16 as Spring @RestController / @Service / @Repository classes; Spring Security enforces role-based access control server-side per SR-03, independent of what the UI displays.
+3.2.1 Build Tool — Maven (preferred over Gradle and Ant)
+Maven over Gradle: Maven's declarative XML POM (pom.xml) is more predictable and easier for a small student team to read and debug than Gradle's Groovy/Kotlin DSL build scripts, and Maven's “convention over configuration” project layout maps directly onto the WAR-packaging, Tomcat-deployment workflow the brief specifies, with less build-script authoring than Gradle typically requires.
+Maven over Ant: Ant is a lower-level task runner with no built-in dependency management or standard project structure (both would need to be hand-rolled, e.g. with a separate Ivy configuration); Maven provides both out of the box, which materially reduces setup effort for a team new to Java build tooling.
+Jenkins/Selenium fit: Maven has first-class Jenkins plugin support (build step, test-result publishing) and integrates the Selenium suite directly as Maven test/integration-test goals (mvn test / mvn verify), which is exactly how the brief's Week-9 and Week-10 tasks describe running and later automating the tests.
+3.3 Database — MySQL
+What: A relational database (MySQL, or MariaDB as a drop-in equivalent) holding Users, Tickets, Categories, and a ticket status-history table, accessed from the backend through Spring Data JPA (Hibernate) entities and repositories.
+Why: The data described in SRS §8 is naturally relational — a ticket has a fixed set of fields, references a category and a creator/assignee (both Users), and requires reliable, atomic status updates. A relational database gives referential integrity (e.g., a ticket cannot reference a non-existent category) and straightforward reporting queries for the dashboard (COUNT/GROUP BY), which a document store would not provide as naturally. MySQL is free, mature, has first-class Docker images, and pairs directly with Spring Data JPA, keeping the learning curve low.
+Fit with SRS: persists all fields in the SRS §8 data dictionary; supports FR-13/FR-14 dashboard aggregation via simple grouped queries; satisfies NFR-04 (no loss of confirmed data) through transactional writes (Spring's @Transactional).
+3.4 API Technology — REST over HTTPS, JSON
+What: A RESTful API (resource-oriented endpoints under /api/...), implemented as Spring MVC @RestController classes returning JSON, secured with token-based authentication (JSON Web Tokens, JWT) via Spring Security.
+Why: REST is simple to design, simple for Selenium/integration tests to exercise independently of the UI, and requires no extra infrastructure (unlike, e.g., GraphQL or gRPC, which would add complexity disproportionate to the MVP's needs). Spring Web is the standard, well-documented way to expose REST endpoints from a Spring Boot application.
+Fit with SRS: directly satisfies §7.2 (“an internal interface, e.g., a web API, sufficient to support the functional requirements ... and to allow automated Selenium tests to exercise the application's workflows”).
+3.5 Web / Application Server — Apache Tomcat (backend) behind Nginx (frontend + reverse proxy)
+What: The backend is packaged as a WAR and deployed to Apache Tomcat 10, the servlet container that hosts the running Spring Boot application, exactly as the brief's Week-8 task (“Deploy the build to Tomcat or Nginx”) specifies for a Java backend. An Nginx instance sits in front as the single public entry point: it serves the built React static files directly and reverse-proxies /api/ requests through to Tomcat.
+Why: Tomcat is the standard, free, open-source servlet container for Java web applications and is what makes the Maven-built WAR runnable; it is also the deployment target the brief itself names. Nginx is added at the same layer to serve the frontend's static build efficiently and to give the deployment a single, well-known entry point for TLS termination and routing between the frontend and backend containers — satisfying the brief's “Tomcat or Nginx” deployment target with both tools used for what they are each best at, rather than treating the two as mutually exclusive alternatives.
+3.6 Git and GitHub
+What: Git for version control; GitHub for the shared remote repository, pull requests, code review, issue tracking, and — critically — as the webhook source that triggers Jenkins builds.
+Why: Mandated by the Week 1/2 project brief; industry-standard; integrates natively with Jenkins via webhooks and with branch-protection rules that enforce the team's Definition of Done.
+3.7 Jenkins
+What: The CI/CD orchestration server. A declarative Jenkinsfile, checked into the repository, defines the pipeline stages (Section 5 and Section 14), invoking Maven (mvn clean package, mvn test) as its build job for the backend, per the brief's Week-7 task.
+Why: Mandated by the project brief; free and self-hostable (a good fit for a student VM); its Jenkinsfile-as-code approach keeps the pipeline definition version-controlled alongside the application, and it has mature plugins for GitHub webhooks, Maven builds, JUnit-style test reporting, and Docker builds.
+3.8 Selenium
+What: Selenium WebDriver, used to drive an automated browser (headless Chrome) against a running instance of the application, exercising the MVP's core workflows end-to-end (login, create ticket, update status, search, dashboard view) for each role. Test cases are written as JUnit tests and executed through Maven (the Maven Surefire/Failsafe plugins), per the brief's Week-9 task (“Execute the suite locally through Maven”).
+Why: Mandated by the project brief; the natural tool for functional UI testing of a web application, and directly enabled by the SRS's requirement that the API/UI separation be “sufficient to allow the automated Selenium tests ... to exercise the application's workflows” (§7.2).
+3.9 Docker
+What: Three containers — frontend (Nginx serving the built React app), backend (Tomcat with the Maven-built WAR deployed into its webapps folder), and database (MySQL, with a named volume for persistence) — orchestrated locally/in CI with Docker Compose.
+Why: Mandated by the project brief; guarantees the application runs identically in development, in the Jenkins test stage, and in the deployment environment, and gives the team a clean, reproducible unit to hand to Ansible for deployment.
+3.10 Configuration Management — Ansible (preferred over Puppet)
+What: Ansible playbooks that provision the target host (install Docker/Docker Compose if absent), copy the deployment configuration, and bring the container stack up/down.
+Why Ansible over Puppet: Ansible is agentless (it only needs SSH access to the target host, whereas Puppet requires an agent installed and a Puppet master server to be maintained) and uses simple, readable YAML playbooks rather than Puppet's declarative DSL. For a small student team managing a single target VM for demonstration purposes, Ansible's lower operational overhead — no master server to stand up and maintain — makes it the more manageable choice, while still meeting the project brief's “Ansible or Puppet” requirement.
+3.11 Technology Stack Summary
+Layer
+Technology
+Primary Role
+Frontend
+React (Vite) + Bootstrap/CSS
+Role-aware SPA UI consumed by all three user roles
+Backend / API
+Java 17 + Spring Boot (Spring Web, Spring Data JPA, Spring Security)
+REST API, business logic, RBAC enforcement
+Build tool
+Apache Maven
+Compiles, tests, and packages the backend as a deployable WAR; runs the Selenium suite
+Database
+MySQL (relational)
+Persistent storage of Users, Tickets, Categories, Status History
+API style
+REST over HTTPS, JSON, JWT auth (Spring Security)
+Contract between frontend and backend; testable by Selenium/integration tests
+Web/app server
+Apache Tomcat (backend WAR) behind Nginx (frontend + reverse proxy)
+Servlet container for the backend; static file serving and routing for the frontend
+Version control
+Git + GitHub
+Source control, PRs, code review, Jenkins trigger
+CI/CD orchestration
+Jenkins (declarative Jenkinsfile, Maven build job)
+Build → test → containerise → deploy pipeline
+Functional testing
+Selenium WebDriver (JUnit, run via Maven)
+Automated end-to-end UI tests per role workflow
+Containerisation
+Docker + Docker Compose
+Reproducible packaging of frontend, backend, database
+Configuration management / deployment
+Ansible
+Host provisioning and automated deployment of the container stack
+4. High-Level Architecture
+The application follows a conventional three-tier architecture: a browser-based presentation tier, a REST API tier containing business logic, and a relational persistence tier. All cross-tier communication is synchronous, over HTTP(S) and SQL respectively; no message queue or caching tier is introduced, since neither is required at MVP scale (NFR-06).
+Diagram 1: High-Level Application Architecture
+   [ Employee ]   [ IT Support Staff ]   [ Administrator ]              \          |          /               v         v         v        +-------------------------------+        |   Frontend (React SPA)        |        |   served via Nginx            |        +---------------+---------------+                         | REST/JSON over HTTPS (JWT)                         v        +-------------------------------+        |  Backend / API (Java 17,      |        |  Spring Boot, WAR on Tomcat)  |        |  — business logic, RBAC,      |        |  workflow rules                |        +---------------+---------------+                         | JPA/SQL (parameterised queries)                         v        +-------------------------------+        |   Database (MySQL)             |        |   Users | Tickets | Categories |        |   | Status History             |        +-------------------------------+
+Components: Three human actors (Employee, IT Support Staff, Administrator) as defined in SRS §2.3; Frontend tier (React SPA, served by Nginx); Backend/API tier (Java/Spring Boot, deployed as a Maven-built WAR to Apache Tomcat); Database tier (MySQL).
+Relationships / Arrows: Users interact only with the Frontend, never directly with the API or database. The Frontend calls the Backend exclusively over the REST API. The Backend is the only tier permitted to query the Database. Each arrow represents a one-directional request; responses flow back along the same path.
+Explanation: This layering enforces the security requirement that access control be applied server-side (SR-03): even though the Frontend hides menu items a role should not see, every request is independently re-checked by the Backend (Spring Security) before it is allowed to reach the Database. The same layering is what makes the system testable — Selenium exercises the top of this stack (the browser), while Maven-run integration tests can exercise the Spring REST layer directly.
+(To be rendered as a formal diagram — e.g., draw.io / Lucidchart — in the final report; this specification is sufficient to construct it.)
+4.1 Why a Monolithic Backend, Not Microservices
+A single Spring Boot application, internally organised into modules (Section 6), was chosen over a microservices split (e.g., a separate authentication service, ticket service, and dashboard service). At MVP scale — a handful of related resources and a small team — microservices would add inter-service network calls, multiple deployable units, and multiple Docker images to build and orchestrate, without a corresponding benefit; the coherent, manageable stack this project calls for is better served by one deployable backend WAR with clearly separated internal packages/modules.
+5. DevOps Architecture
+The DevOps pipeline realises the lifecycle introduced conceptually in the Week 2 document, using the specific tools mandated by the project brief. Each stage below produces an artefact consumed by the next, so that a single commit to the main branch can, in principle, flow through to a running deployment without manual intervention.
+Diagram 2: DevOps / CI-CD Pipeline
+ID  Developer |   commits & pushes v[ GitHub Repository ] --webhook--> [ Jenkins Server ]                                        |                                        v                              +-------------------+                              |  Build             |                              |  (mvn clean package|                              |  backend WAR; npm  |                              |  run build frontend)|                              +---------+---------+                                        v                              +-------------------+                              |  Automated Tests   |                              |  (unit + Selenium) |                              +---------+---------+                                        v                              +-------------------+                              |  Docker            |                              |  (build images)    |                              +---------+---------+                                        v                              +-------------------+                              |  Registry          |                              |  (image push)      |                              +---------+---------+                                        v                              +-------------------+                              |  Deployment         |                              |  (Ansible playbook) |                              +---------+---------+                                        v                              +-------------------+                              |  Application        |                              |  (running containers|                              |   users access)     |                              +-------------------+
+Components: Developer, GitHub repository, Jenkins server, Build stage, Automated Tests stage, Docker image build, Container Registry, Ansible-driven Deployment stage, running Application.
+Relationships / Arrows: Each box feeds the next in a strict linear sequence for a successful run; a failure at any stage halts the pipeline and notifies the developer (via GitHub commit status / Jenkins build result) rather than proceeding to the next stage.
+Explanation: This is the backbone that later weeks of the project will implement incrementally, exactly as the Week 2 document describes: version control and build automation first, then automated testing, then containerisation, then automated deployment.
+(To be rendered as a formal diagram — e.g., draw.io / Lucidchart — in the final report; this specification is sufficient to construct it.)
+5.1 Component Explanations
+Developer: Writes code locally, commits to a feature branch, and opens a pull request against the main branch, per the team's branching convention (Week 2).
+GitHub: Hosts the canonical repository. Branch protection requires a passing pipeline before merge. A webhook on push/PR events triggers the Jenkins pipeline automatically.
+Jenkins: Orchestrates all subsequent stages via a single Jenkinsfile checked into the repository, so the pipeline definition is versioned alongside the code it builds.
+Build: Runs mvn clean package for the backend (Maven compiles, unit-tests, and packages the Spring Boot application as a deployable WAR — the brief's Maven build job) and npm ci / npm run build for the frontend (producing the React static bundle), as two parallel build artefacts.
+Automated Tests: Runs backend unit/integration tests first via Maven (fast feedback), then spins up the application (e.g., via Docker Compose in a disposable CI environment, WAR deployed to Tomcat) and runs the Selenium suite — executed through Maven, per the brief's Week-9/10 tasks — against it to validate end-to-end role workflows.
+Docker: Builds the frontend and backend images from their respective Dockerfiles once tests pass, tagging each image with the Git commit hash for traceability.
+Registry: A container image registry (e.g., Docker Hub or the GitHub Container Registry) that stores tagged images, decoupling “where an image was built” from “where it is deployed from.”
+Deployment: An Ansible playbook, invoked by Jenkins as the pipeline's final stage, connects to the target host over SSH, pulls the newly tagged images, and restarts the Docker Compose stack.
+Application: The running set of containers (frontend, backend, database) that end users — Employees, IT Support Staff, and Administrators — access through a browser.
+6. Application Components
+The backend is organised as a single Spring Boot application internally decomposed into the modules below. Each module is a cohesive group of Spring @RestController / @Service / @Repository classes and (where relevant) Spring Data JPA entities; modules communicate only through in-process Java method calls — there is no inter-module network traffic.
+Module
+Responsibility
+Key SRS Requirements
+Authentication module
+Validates credentials at login, issues and verifies JWTs, resolves the user's role, and terminates sessions on logout.
+FR-01, FR-02, FR-03, SR-01, SR-02, SR-04
+Ticket management module
+Creates tickets (assigning a unique ID and initial “Open” status), retrieves ticket lists/detail scoped by role, and applies field-level updates and resolution notes.
+FR-04, FR-05, FR-06
+Search module
+Filters the role-scoped ticket list by keyword (title/description), status, and category, in combination.
+FR-07, Business Rules §Search Behaviour
+Status workflow module
+Validates and applies status transitions against the fixed state machine (Section 11), rejecting any transition not explicitly permitted, and records status-history entries.
+FR-08–FR-12, Business Rules §Valid Status Transitions
+Dashboard module
+Aggregates ticket counts by status and by category on demand, for IT Support Staff and Administrator roles only.
+FR-13, FR-14, FR-15, FR-16
+User / role management module
+Allows an Administrator to create, view, and manage user accounts and their assigned roles.
+FR (Administrative user management), SRS §2.2
+Authorization (RBAC) middleware
+A cross-cutting component invoked by every route: re-validates the requester's role server-side before any module logic executes.
+SR-03, Business Rules §Role Permissions
+The Authorization middleware is deliberately drawn as a cross-cutting concern rather than a peer module: every request passes through it before reaching Ticket Management, Search, Status Workflow, Dashboard, or User Management, which is what allows role rules to be enforced consistently and in one place rather than being re-implemented per module.
+7. User Role and Authorization Design
+Authorization is enforced server-side on every request (SR-03), independent of what the frontend UI happens to display. The permission matrix below implements the SRS Section 6 (“Business Rules — Role Permissions”) and Section 3 functional requirements directly.
+Function
+Employee
+IT Support Staff
+Administrator
+Log in / log out
+Yes
+Yes
+Yes
+Create ticket
+Yes
+No
+No
+View own tickets
+Yes
+N/A (no personal queue)
+Yes (all tickets)
+View shared/assigned ticket queue
+No
+Yes
+Yes (all tickets)
+Search / filter tickets
+Own tickets only
+Shared/assigned queue
+All tickets
+Update ticket status (Open→Assigned)
+No
+Yes
+Yes
+Update ticket status (Assigned→In Progress, In Progress→Resolved)
+No
+Yes (if assignee)
+No (not the assignee)
+Update ticket status (Resolved→Closed)
+No
+Yes
+Yes
+Reassign a ticket (any state → Assigned)
+No
+No
+Yes
+Add resolution notes
+No
+Yes
+Yes
+View dashboard
+No
+Yes
+Yes
+Manage user accounts
+No
+No
+Yes
+Note on the In-Progress/Resolved row: per FR-09/FR-10, these transitions are restricted to the assigned IT Support Staff member specifically (not any IT Support Staff member), so authorization here checks both role and ticket ownership (assigned_to = current user), not role alone.
+7.1 Authorization Enforcement Mechanism
+Every authenticated request carries a JWT identifying the user's ID and role.
+A Spring Security JWT filter decodes and validates the token before any controller method executes, rejecting requests with missing/expired/invalid tokens (SR-04).
+A second Spring Security authorization layer (method-level @PreAuthorize checks and, where relevant, an explicit ownership check against assigned_to) checks the decoded role and ticket ownership against the permission matrix above before the request reaches business logic — so a direct API call attempting to bypass the UI is rejected identically to a disallowed UI action (SR-03).
+8. Use Case Design
+The use cases below cover every major MVP workflow. Each is written as actor, precondition, main flow, and postcondition, tracing to the corresponding functional requirement(s).
+ID
+Use Case
+Primary Actor(s)
+Precondition
+Main Flow
+Postcondition
+Traces to
+UC-01
+Log In
+Employee / IT Support Staff / Administrator
+User has a valid account.
+1. User submits username and password.2. System validates credentials.3. System resolves the user's role and issues a session token.
+User is authenticated and sees a role-appropriate landing view.
+FR-01, FR-03
+UC-02
+Log Out
+Any authenticated user
+User is logged in.
+1. User selects log out.2. System invalidates the active session/token.
+Further access requires re-authentication.
+FR-02
+UC-03
+Create Ticket
+Employee
+User is logged in as Employee.
+1. Employee opens the “new ticket” form.2. Employee supplies title, description, category.3. System validates required fields.4. System generates a unique ticket ID and sets status to Open.
+A new ticket exists with status Open, visible to the Employee and to the shared IT Support queue.
+FR-04, Business Rule §Required Ticket Fields
+UC-04
+View Tickets
+Employee / IT Support Staff / Administrator
+User is logged in.
+1. User opens the ticket list.2. System returns tickets scoped to the user's role (own / shared queue / all).3. User opens an individual ticket to see full detail and status history.
+User sees only the tickets permitted for their role.
+FR-05
+UC-05
+Search / Filter Tickets
+Employee / IT Support Staff / Administrator
+User is viewing a role-scoped ticket list.
+1. User enters a keyword and/or selects a status/category filter.2. System returns matching tickets within the user's permitted scope.
+A filtered list is shown; no ticket outside the user's permitted scope is ever returned.
+FR-07, Business Rule §Search Behaviour
+UC-06
+Assign / Take Up Ticket
+IT Support Staff, Administrator
+Ticket status is Open.
+1. IT Support Staff member takes up the ticket, or Administrator explicitly assigns it.2. System sets status to Assigned and records the assignee.
+Ticket status is Assigned; assignee is recorded.
+FR-08
+UC-07
+Start Work on Ticket
+IT Support Staff (assignee)
+Ticket status is Assigned; user is the assignee.
+1. Assignee marks the ticket as started.2. System sets status to In Progress.
+Ticket status is In Progress.
+FR-09
+UC-08
+Resolve Ticket
+IT Support Staff (assignee)
+Ticket status is In Progress.
+1. Assignee enters resolution notes.2. System validates notes are present.3. System sets status to Resolved.
+Ticket status is Resolved with resolution notes recorded.
+FR-10, Business Rule (Resolved requires notes)
+UC-09
+Close Ticket
+IT Support Staff, Administrator
+Ticket status is Resolved.
+1. User confirms the resolution is satisfactory.2. System sets status to Closed.
+Ticket status is Closed; no further transition is possible.
+FR-11
+UC-10
+Reassign Ticket
+Administrator
+Ticket exists in any state.
+1. Administrator selects a new assignee.2. System sets status to Assigned and updates the assignee.
+Ticket is reassigned; status history reflects the change.
+FR-12
+UC-11
+View Dashboard
+IT Support Staff, Administrator
+User is logged in as IT Support Staff or Administrator.
+1. User opens the dashboard.2. System aggregates and returns current ticket counts by status and by category.
+User sees an up-to-date summary without a manual refresh action.
+FR-13, FR-14, FR-15, FR-16
+UC-12
+Manage User Accounts
+Administrator
+User is logged in as Administrator.
+1. Administrator creates/edits/disables a user account and assigns a role.2. System persists the change.
+The user account reflects the updated role/status on next login.
+SRS §2.2 (administrative management of user accounts)
+9. Database Conceptual Design
+The conceptual model below persists exactly the data content specified in SRS Section 8, plus a Status History entity that supports the “status history” viewable per FR-05 and provides an audit trail for the workflow transitions in FR-08–FR-12. No new business data beyond what the SRS specifies is introduced.
+9.1 Entities and Key Attributes
+Entity
+Key Attributes
+Notes
+User
+user_id (PK), name, email, username (unique), password_hash, role, created_at
+role is one of Employee, IT Support Staff, Administrator. Passwords stored hashed only (SR-02).
+Ticket
+ticket_id (PK), title, description, category_id (FK), priority, status, created_by (FK → User), assigned_to (FK → User, nullable), resolution_notes, created_date, updated_date
+status is constrained to the five workflow states (Section 11). assigned_to is null until a ticket reaches Assigned.
+Category
+category_id (PK), name (e.g., Hardware, Software, Network, Access)
+Stored as data (not hard-coded) so new categories can be added without code change (NFR-05).
+StatusHistory
+history_id (PK), ticket_id (FK → Ticket), old_status, new_status, changed_by (FK → User), changed_at
+One row per transition; supports the status-history view required by FR-05 and provides an audit trail.
+9.2 Relationships
+A Category has many Tickets; a Ticket belongs to exactly one Category (1:N).
+A User (as creator) has many Tickets; a Ticket is created by exactly one User (1:N, Ticket.created_by → User.user_id).
+A User (as assignee) has many Tickets; a Ticket has at most one current assignee (1:N, Ticket.assigned_to → User.user_id, nullable).
+A Ticket has many StatusHistory entries; each StatusHistory entry belongs to exactly one Ticket (1:N).
+A User (as the actor who made a change) has many StatusHistory entries (1:N, StatusHistory.changed_by → User.user_id).
+Diagram 3: Entity–Relationship (ER) Diagram
+  [Category] 1───N [Ticket] N───1 [User] (created_by)                  |   \                  |    N───1 [User] (assigned_to, nullable)                  1                  |                  N             [StatusHistory] N───1 [User] (changed_by)
+Components: Four entities: Category, Ticket, User, StatusHistory. Ticket has two separate relationships to User (creator and assignee).
+Relationships / Arrows: Category 1–N Ticket; User 1–N Ticket (created_by); User 1–N Ticket (assigned_to, optional); Ticket 1–N StatusHistory; User 1–N StatusHistory (changed_by).
+Explanation: Modelling creator and assignee as two distinct foreign keys to User (rather than a single 'owner' field) reflects the SRS distinction between the Employee who raised a ticket and the IT Support Staff member currently responsible for it, and is what makes role-scoped queries (FR-05: 'Employee: own tickets; IT Support Staff: shared/assigned queue') a straightforward WHERE clause rather than an application-level workaround.
+(To be rendered as a formal diagram — e.g., draw.io / Lucidchart — in the final report; this specification is sufficient to construct it.)
+10. API Design
+All endpoints are prefixed /api/. Except for login, every endpoint requires a valid JWT in the Authorization header; the Authorization middleware (Section 7.1) additionally enforces the role/ownership rules from the Section 7 permission matrix on every request, regardless of what the frontend requests.
+Method
+Endpoint
+Purpose
+Auth Requirement
+POST
+/api/auth/login
+Authenticate a user and issue a JWT.
+None (public)
+POST
+/api/auth/logout
+Invalidate the current session/token.
+Any authenticated user
+POST
+/api/tickets
+Create a new ticket (title, description, category).
+Employee
+GET
+/api/tickets
+List tickets, scoped by role; supports ?q=&status=&category= filters.
+Any authenticated user (results scoped per role)
+GET
+/api/tickets/{id}
+Retrieve full detail of a single ticket, including status history.
+Owner, assignee, IT Support Staff, or Administrator
+PUT
+/api/tickets/{id}
+Update ticket fields not covered by a status transition (e.g., resolution notes prior to Resolved).
+IT Support Staff (assignee) or Administrator
+PATCH
+/api/tickets/{id}/status
+Apply a status transition (Open→Assigned, Assigned→In Progress, etc.), validated against the state machine.
+IT Support Staff (assignee) or Administrator, per Section 7 matrix
+PATCH
+/api/tickets/{id}/assign
+Assign or reassign a ticket to a specific IT Support Staff member.
+IT Support Staff (initial take-up) or Administrator (reassignment)
+GET
+/api/dashboard/summary
+Return ticket counts grouped by status and by category.
+IT Support Staff or Administrator
+GET
+/api/categories
+List available ticket categories.
+Any authenticated user
+GET
+/api/users
+List user accounts.
+Administrator
+POST
+/api/users
+Create a new user account and assign a role.
+Administrator
+PUT
+/api/users/{id}
+Update a user account (e.g., role, active status).
+Administrator
+A dedicated /status endpoint (PATCH) rather than a generic ticket PUT was chosen for status changes specifically because status transitions carry their own validation rules (Section 11) and must always write a corresponding StatusHistory row; separating this from general field updates keeps that invariant enforceable in exactly one place in the code.
+11. Ticket Lifecycle Design
+The ticket status lifecycle is fixed by the SRS (Section 3.3) and is treated here as an explicit, enforced state machine — the system must reject any transition not listed below, per the SRS business rule that “a ticket may only move between statuses along the transitions defined ... any other transition is invalid and shall be rejected.”
+Diagram 4: Ticket Status State Machine
+   [ Open ] ──(FR-08)──> [ Assigned ] ──(FR-09)──> [ In Progress ] ──(FR-10)──> [ Resolved ] ──(FR-11)──> [ Closed ]                   ^                                                                  |                   |__________________________ (FR-12, Administrator reassignment) ___|                                (any state → Assigned)
+Components: Five states: Open, Assigned, In Progress, Resolved, Closed. One additional reassignment transition (FR-12) from any state back to Assigned.
+Relationships / Arrows: Forward transitions are strictly sequential (Open→Assigned→In Progress→Resolved→Closed); the single exception is Administrator-initiated reassignment, which can occur from any state and returns the ticket to Assigned.
+Explanation: No transition skips a state (e.g., Open directly to Closed is invalid), and no transition moves backward except via the explicit reassignment path — this matches the SRS business rule intent that the recorded workflow accurately reflect how a ticket was actually handled.
+(To be rendered as a formal diagram — e.g., draw.io / Lucidchart — in the final report; this specification is sufficient to construct it.)
+11.1 Transition Rules and Responsible Roles
+Transition
+Responsible Role(s)
+Enforced Condition
+Open → Assigned
+IT Support Staff, Administrator
+Ticket is in the shared queue and is taken up, or explicitly assigned by an Administrator.
+Assigned → In Progress
+IT Support Staff (the assignee only)
+Only the currently assigned staff member may start work.
+In Progress → Resolved
+IT Support Staff (the assignee only)
+Resolution notes must be present before the transition is accepted.
+Resolved → Closed
+IT Support Staff, Administrator
+Resolution is confirmed satisfactory; no further employee action required.
+Any state → Assigned (reassignment)
+Administrator only
+Used when the original assignee is unavailable; updates assigned_to and writes a StatusHistory row.
+Every accepted transition writes one row to StatusHistory (old_status, new_status, changed_by, changed_at), which is what FR-05's “status history” ticket-detail view reads from.
+12. Security Architecture
+Security controls are designed to satisfy SRS Section 9 (Security Requirements SR-01 to SR-05) and NFR-02, at a level appropriate to an academic, non-production deployment.
+Concern
+Design Control
+Traceability
+Authentication
+Username/password login validated server-side; failed attempts return a generic error without revealing which field was wrong.
+FR-01, SR-01
+Password storage
+Passwords hashed with a salted, industry-standard algorithm (e.g., bcrypt); never stored or logged in plain text.
+SR-02, NFR-02
+Session management
+Stateless JWTs with a defined expiry; expired/invalid tokens are rejected, requiring re-login.
+SR-04
+Authorization
+Server-side RBAC middleware re-checks role (and ticket ownership where relevant) on every request, independent of the UI.
+SR-03
+Data isolation
+All ticket queries are scoped by the middleware to the requesting user's permitted data before results are returned — an Employee's query can never return another Employee's ticket.
+SR-05
+Injection protection
+All database access uses parameterised queries / an ORM query builder; no string-concatenated SQL.
+General good practice supporting NFR-02
+Transport security
+HTTPS between browser and Nginx in the deployed environment (a self-signed or free certificate is acceptable for an academic demo).
+NFR-02 (data protection in transit)
+Input validation
+Required-field and type validation is applied server-side on every write endpoint, in addition to client-side UX validation.
+SRS §7.1, Business Rule §Required Ticket Fields
+These controls are scoped to what SRS Section 9 requires; they are not a claim of production-grade hardening (e.g., no formal penetration testing, rate limiting, or intrusion detection is in scope for this academic MVP — see Section 19, Limitations).
+13. Deployment Architecture
+The application is deployed as a fixed set of Docker containers on a single target host (a cloud VM or a local VM used for demonstration), consistent with SRS §2.4 (“a single server/virtual machine environment suitable for an academic deployment”).
+Diagram 5: Deployment / Container Architecture
+                     Target Host (VM)        +---------------------------------------------+        |  Docker Compose stack                        |        |                                               |        |  +-----------+   +-----------+   +----------+ |        |  | frontend  |   | backend   |   | database | |        |  | (Nginx +  |-->| (Tomcat + |-->| (MySQL,  | |        |  | React     |   | Spring    |   | named    | |        |  | build)    |   | Boot WAR) |   | volume)  | |        |  | :80/:443  |   | :8080     |   | :3306    | |        |  +-----------+   +-----------+   +----------+ |        +---------------------------------------------+                       ^                       | HTTPS                 [ Browser / User ]
+Components: One target host running Docker Compose with three containers: frontend (Nginx + built React app), backend (Apache Tomcat running the Maven-built Spring Boot WAR), database (MySQL with a persistent named volume). Deployment is managed by Ansible from the Jenkins pipeline.
+Relationships / Arrows: Users reach only the frontend container's exposed port over HTTPS. The frontend container forwards API calls to the backend container over the internal Compose network. The backend container is the only one with access to the database container.
+Explanation: Confining external access to a single exposed entry point (the frontend/Nginx container) and keeping the database container unreachable from outside the host's internal Docker network is a simple but meaningful security boundary, and it matches the single-VM deployment model the SRS operating environment describes.
+(To be rendered as a formal diagram — e.g., draw.io / Lucidchart — in the final report; this specification is sufficient to construct it.)
+13.1 Environments
+Development: run locally via docker-compose up on a developer's machine, pointed at a local MySQL container.
+CI (Jenkins): an ephemeral Compose stack spun up for the Automated Tests stage, torn down after the Selenium suite completes.
+Deployment/demo target: a persistent Compose stack on the shared demo VM, updated by the Ansible-driven Deployment stage of the pipeline.
+14. CI/CD Integration Architecture
+This section specifies the Jenkins pipeline referenced in Section 5 at the stage level, as it will be expressed in the project's Jenkinsfile. No pipeline script is included here — this is the design that the Jenkinsfile will implement in a later week.
+Stage
+Trigger / Input
+Action
+Output / Gate
+Checkout
+GitHub webhook on push/PR
+Jenkins checks out the triggering commit.
+Source tree available to subsequent stages
+Install & Build
+Checked-out source
+mvn clean package for the backend (compiles and packages the Spring Boot WAR) and npm ci / npm run build for the frontend (Vite build).
+Build artefacts (WAR + static bundle); stage fails the pipeline on any build error
+Unit / Integration Tests
+Build artefacts
+Run backend unit/integration test suite via Maven (mvn test, JUnit).
+Test report (Maven Surefire); pipeline halts on failing tests
+Selenium (End-to-End) Tests
+A temporary Docker Compose environment brought up from the current build (WAR deployed to a Tomcat container)
+Run the Selenium suite via Maven (mvn verify, Maven Failsafe) against the running instance, covering each role's core workflow.
+Test report; pipeline halts on failing tests (Section 15)
+Docker Image Build
+Tests passed
+Build frontend (Nginx + React build) and backend (Tomcat + WAR) images, tagged with the Git commit hash.
+Two tagged images
+Push to Registry
+Images built
+Push tagged images to the container registry.
+Images available for deployment
+Deploy (Ansible)
+Images pushed
+Jenkins invokes an Ansible playbook that updates the target host's Compose stack to the new image tags.
+Updated running application
+Notify
+Any pipeline outcome
+Build status reported back to GitHub (commit status check) and to the team.
+Team visibility into pipeline health
+Each stage is a hard gate: a failure at Unit/Integration Tests or Selenium Tests prevents an image from ever being built or deployed, so a broken build cannot reach the demonstration environment.
+15. Testing Architecture
+Testing is layered, matching the pipeline stages in Section 14.
+15.1 Unit / Integration Tests (Backend)
+Scope: individual module methods (e.g., status-transition validation, search filtering logic) and Spring REST controller behaviour, run against a disposable test database (e.g., an in-memory H2 instance or a Dockerised MySQL test container).
+Tooling: JUnit 5, with Spring Boot's test support (@SpringBootTest, MockMvc) for controller-level tests, run via Maven (mvn test) in the Jenkins Unit/Integration Tests stage — the Maven Surefire plugin produces the test report Jenkins publishes.
+15.2 Where Selenium Fits
+Selenium is the end-to-end, functional testing layer, sitting above the unit/integration layer. It does not replace backend unit tests; it validates the system the way a user actually experiences it — through the browser — which the SRS explicitly calls for (§7.2), and the official Week-3/9/10 task brief calls for specifically as a Maven-executed suite.
+What it tests: complete role workflows driven through the rendered UI — e.g., an Employee logging in and creating a ticket (UC-01, UC-03); IT Support Staff taking up, progressing, and resolving a ticket (UC-06–UC-08); an Administrator reassigning a ticket and viewing the dashboard (UC-10, UC-11).
+How it is run: Selenium WebDriver test cases are written as JUnit tests under the Maven integration-test source set and executed with the Maven Failsafe plugin (mvn verify), matching the brief's Week-9 instruction to “execute the suite locally through Maven” and Week-10's instruction to integrate that same suite into Jenkins.
+When it runs: automatically, as its own stage in the Jenkins pipeline (Section 14), against a temporary Docker Compose instance of the full stack (WAR deployed to a Tomcat container) — never against the live demonstration deployment.
+How it is structured: one Selenium test class/module per major workflow, using explicit waits (not fixed sleeps) for elements to render, and a dedicated seeded test dataset (test users for each role, a handful of sample tickets) that is reset before each run so tests are repeatable.
+Why it matters for this project specifically: it is the automated proof that the frontend, backend, and database — three independently developed layers — genuinely work together, which is exactly the kind of regression a small team can otherwise miss.
+16. Configuration Management Architecture
+Ansible (selected over Puppet in Section 3.10) is responsible for taking a built, tested set of Docker images and turning them into a running application on the target host — the “Deployment” stage of Section 14.
+16.1 Where Ansible Fits
+Inventory: an Ansible inventory file lists the target host(s) — at minimum, the single demo/deployment VM; a staging host may be added later if the team's timeline allows.
+Playbook responsibilities: (1) ensure Docker and Docker Compose are installed on the target host (idempotent — the playbook can be re-run safely without side effects if they are already present); (2) copy/update the Compose file and environment configuration (e.g., database credentials, JWT secret) onto the host; (3) log in to the container registry and pull the newly built image tags; (4) recreate the Compose stack with the new images; (5) verify the application responds (a basic health check).
+Secrets handling: environment-specific values (database password, JWT signing secret) are kept out of the Git repository and supplied to Ansible via Ansible Vault or CI-injected environment variables, never hard-coded in the playbook.
+Invocation: Jenkins runs the playbook (ansible-playbook deploy.yml) as the final pipeline stage over SSH, using a dedicated deployment key scoped only to that purpose.
+This keeps deployment fully declarative and repeatable: the same playbook run against a freshly provisioned VM should produce the same running application, without any manual server configuration step.
+17. Scalability and Maintainability Considerations
+17.1 Scalability
+The backend is stateless (session state lives in the JWT, not in server memory), so, if ever required beyond this project's scope, multiple backend container instances could be run behind a load balancer without code changes.
+The database layer is the more likely bottleneck at higher load; indexes on frequently filtered/searched columns (status, category_id, created_by, assigned_to, and a full-text or LIKE-friendly index on title/description) keep the search and dashboard-aggregation queries efficient at the SRS's target scale of ~20–30 concurrent users (NFR-06).
+No caching layer, message queue, or horizontal auto-scaling is introduced, since none is warranted at MVP/academic-demonstration scale; Section 19 records this as a deliberate limitation, not an oversight.
+17.2 Maintainability
+Categories and (if extended later) priorities are stored as database rows rather than hard-coded constants, so adding a category requires a data change, not a code change, directly satisfying NFR-05.
+The module boundaries in Section 6 keep each functional area's logic together, so a change to, for example, search behaviour touches only the Search module and not the Status Workflow or Dashboard modules.
+The Jenkinsfile and Ansible playbooks are version-controlled alongside the application code, so pipeline and infrastructure changes go through the same code-review process as application changes.
+18. Design Decisions and Justifications
+Decision
+Alternative Considered
+Why This Design Was Chosen
+Java 17 + Spring Boot backend (Maven build)
+Node.js/Express (single JavaScript stack)
+The official Week-3/7/9 task brief for this project mandates a Maven/Gradle/Ant build tool and a Tomcat/Nginx deployment target; a Node.js backend cannot satisfy that constraint. Java/Spring Boot is the most coherent, well-documented framework that builds with Maven and deploys as a WAR to Tomcat, while still exposing a clean REST API to the React frontend.
+Maven build tool
+Gradle, Ant
+Maven's declarative XML POM is more predictable for a small team new to Java tooling than Gradle's DSL, provides dependency management and a standard project layout Ant lacks, and integrates directly with Jenkins and with the Selenium suite as Maven test goals — see Section 3.2.1.
+MySQL (relational)
+MongoDB (document store)
+Ticket/User/Category data is fixed-shape and relational, with meaningful foreign-key integrity requirements (e.g., a ticket must reference a real category); a relational database also makes the dashboard's grouped-count queries (FR-13/FR-14) simpler than they would be in a document model.
+Monolithic backend
+Microservices (separate auth/ticket/dashboard services)
+Microservices would add inter-service network calls and multiple deployable units without a corresponding benefit at this scale, working against the brief's preference for a coherent, manageable stack.
+REST API
+GraphQL
+REST requires no extra query-layer infrastructure, is simpler for Selenium/integration tests to exercise directly, and is sufficient for the MVP's small, well-defined set of resources.
+Ansible for configuration management
+Puppet
+Agentless (SSH-only, no master server to maintain) and lower operational overhead for a single target VM managed by a small team — see Section 3.10 for full justification.
+Three-container Docker Compose deployment
+A single combined container running all three layers
+Separate containers per tier match how the application is actually built and tested (frontend build vs backend runtime vs database), and allow each to be updated/scaled independently if ever needed.
+Dedicated PATCH /status endpoint for workflow transitions
+A single generic PUT /tickets/{id} for all updates
+Status transitions carry validation and audit-logging obligations (Section 11) that are easier to guarantee in one code path when isolated from general field edits.
+19. Limitations of the Proposed Design
+This design is intentionally scoped to an academic MVP running the Week 1/2/3 requirement set. The following limitations are acknowledged deliberately, not as oversights:
+Single-host deployment: the design targets one VM running one Docker Compose stack; it does not provide high availability, automatic failover, or horizontal load balancing.
+No caching or message-queue layer: acceptable at the SRS's target of ~20–30 concurrent users (NFR-06), but the design would need revisiting before any larger-scale or production use.
+Academic-grade, not production-grade, security: SR-01–SR-05 are satisfied, but the design does not include rate limiting, intrusion detection, formal penetration testing, or a managed secrets vault beyond Ansible Vault.
+No native mobile application: consistent with the Week 1 out-of-scope decision; the frontend is a desktop-browser web application only (SRS §7.4).
+No self-registration: user accounts are provisioned by an Administrator only, consistent with the SRS's stated assumption (§2.6); there is no employee self-service signup flow.
+Single-organisation, self-contained data model: no integration with external identity providers, email systems, or third-party ticketing tools, consistent with SRS §2.1.
+Test environment fidelity: the Selenium suite runs against a temporary CI-built stack, not the live demo deployment, so a small class of purely environment-specific issues (e.g., host-level configuration drift) would not be caught by the pipeline alone.
+20. Conclusion
+This document has translated the functional and non-functional requirements defined in the Week 3 SRS — and the technology constraints set by the official Week 1–15 task-allocation sheet for Roll No. 24102B2003 — into a concrete technical design: a React frontend, a Java 17/Spring Boot REST API backend built with Maven and deployed as a WAR to Apache Tomcat behind Nginx, a MySQL relational database, and a five-stage DevOps pipeline (Git/GitHub, Jenkins with a Maven build job, Selenium executed through Maven, Docker, Ansible) that builds, tests, containerises, and deploys the application. Every module, database entity, API endpoint, and workflow rule in this design traces directly to a named SRS requirement or a specific line of the official task brief, so that implementation in the weeks that follow can proceed against a single, shared, unambiguous technical blueprint, without redefining scope already fixed by the Week 1, Week 2, and Week 3 deliverables.
+No part of this architecture has been implemented at the time of writing; this document describes the plan against which implementation, testing, and the CI/CD pipeline itself will be built and evaluated in subsequent project weeks.
