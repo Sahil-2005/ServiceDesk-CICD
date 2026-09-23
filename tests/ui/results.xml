@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites><testsuite name="pytest" errors="4" failures="0" skipped="0" tests="4" time="0.743" timestamp="2026-09-24T00:17:55.179778" hostname="DESKTOP-DR3HAFE"><testcase classname="tests.ui.test_ui" name="test_dashboard_loads" time="0.002"><error message="failed on setup with &quot;Failed: EdgeDriver executable not found at: C:\\tools\\webdriver\\msedgedriver.exe&quot;">@pytest.fixture(scope="module")
+    def driver():
+        if not os.path.exists(EDGEDRIVER_PATH):
+&gt;           pytest.fail(f"EdgeDriver executable not found at: {EDGEDRIVER_PATH}")
+E           Failed: EdgeDriver executable not found at: C:\\tools\\webdriver\\msedgedriver.exe
+
+tests\ui\test_ui.py:19: Failed</error></testcase><testcase classname="tests.ui.test_ui" name="test_ticket_list_loads" time="0.001"><error message="failed on setup with &quot;Failed: EdgeDriver executable not found at: C:\\tools\\webdriver\\msedgedriver.exe&quot;">@pytest.fixture(scope="module")
+    def driver():
+        if not os.path.exists(EDGEDRIVER_PATH):
+&gt;           pytest.fail(f"EdgeDriver executable not found at: {EDGEDRIVER_PATH}")
+E           Failed: EdgeDriver executable not found at: C:\\tools\\webdriver\\msedgedriver.exe
+
+tests\ui\test_ui.py:19: Failed</error></testcase><testcase classname="tests.ui.test_ui" name="test_ticket_create_form_loads" time="0.001"><error message="failed on setup with &quot;Failed: EdgeDriver executable not found at: C:\\tools\\webdriver\\msedgedriver.exe&quot;">@pytest.fixture(scope="module")
+    def driver():
+        if not os.path.exists(EDGEDRIVER_PATH):
+&gt;           pytest.fail(f"EdgeDriver executable not found at: {EDGEDRIVER_PATH}")
+E           Failed: EdgeDriver executable not found at: C:\\tools\\webdriver\\msedgedriver.exe
+
+tests\ui\test_ui.py:19: Failed</error></testcase><testcase classname="tests.ui.test_ui" name="test_ticket_create_validation" time="0.002"><error message="failed on setup with &quot;Failed: EdgeDriver executable not found at: C:\\tools\\webdriver\\msedgedriver.exe&quot;">@pytest.fixture(scope="module")
+    def driver():
+        if not os.path.exists(EDGEDRIVER_PATH):
+&gt;           pytest.fail(f"EdgeDriver executable not found at: {EDGEDRIVER_PATH}")
+E           Failed: EdgeDriver executable not found at: C:\\tools\\webdriver\\msedgedriver.exe
+
+tests\ui\test_ui.py:19: Failed</error></testcase></testsuite></testsuites>

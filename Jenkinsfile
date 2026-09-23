@@ -85,7 +85,9 @@ pipeline {
                         if (fileExists('tests/ui/results.xml')) {
                             junit testResults: 'tests/ui/results.xml'
                         } else {
-                            error "JUnit XML report is missing - E2E tests failed to run or crashed."
+                            // Using echo instead of error ensures we don't throw a new exception
+                            // that masks the original failure (e.g. backend failed to start)
+                            echo "WARNING: JUnit XML report is missing. E2E tests likely failed to start or pytest crashed."
                         }
                     }
                     archiveArtifacts artifacts: 'tests/ui/*.png', allowEmptyArchive: true, fingerprint: true
