@@ -1,5 +1,6 @@
 package com.devopsproject.servicedesk.controller;
 
+import com.devopsproject.servicedesk.dto.TicketUpdateDTO;
 import com.devopsproject.servicedesk.model.Ticket;
 import com.devopsproject.servicedesk.model.TicketStatus;
 import com.devopsproject.servicedesk.service.TicketService;
@@ -46,7 +47,7 @@ public class TicketController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Ticket> updateTicket(@PathVariable Long id, @Valid @RequestBody Ticket ticketDetails) {
+    public ResponseEntity<Ticket> updateTicket(@PathVariable Long id, @Valid @RequestBody TicketUpdateDTO ticketDetails) {
         Ticket updatedTicket = ticketService.updateTicket(id, ticketDetails);
         return new ResponseEntity<>(updatedTicket, HttpStatus.OK);
     }

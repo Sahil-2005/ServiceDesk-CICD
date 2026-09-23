@@ -1,5 +1,6 @@
 package com.devopsproject.servicedesk.controller;
 
+import com.devopsproject.servicedesk.dto.TicketUpdateDTO;
 import com.devopsproject.servicedesk.model.Ticket;
 import com.devopsproject.servicedesk.model.TicketPriority;
 import com.devopsproject.servicedesk.model.TicketStatus;
@@ -38,6 +39,8 @@ public class TicketControllerIntegrationTest {
         ticketRepository.deleteAll();
     }
 
+    // --- CREATE ---
+
     @Test
     void createTicket_ValidInput_ReturnsCreatedTicket() throws Exception {
         Ticket ticket = new Ticket();
@@ -70,6 +73,8 @@ public class TicketControllerIntegrationTest {
                 .andExpect(jsonPath("$.category", notNullValue()));
     }
 
+    // --- GET ---
+
     @Test
     void getTicket_ExistingId_ReturnsTicket() throws Exception {
         Ticket ticket = new Ticket();
@@ -90,6 +95,60 @@ public class TicketControllerIntegrationTest {
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.error", is("Not Found")));
     }
+
+    // --- UPDATE (PUT) ---
+
+    @Test
+    void updateTicket_WithoutStatusField_Succeeds() throws Exception {
+        // Create a ticket with ASSIGNED status
+        Ticket ticket = new Ticket();
+        ticket.setTitle("Original Title");
+        ticket.setDescription("Original Description");
+        ticket.setCategory("Hardware");
+        ticket.setPriority(TicketPriority.LOW);
+        ticket.setStatus(TicketStatus.ASSIGNED);
+        ticket = ticketRepository.save(ticket);
+
+        // Update with DTO that has no status field
+        TicketUpdateDTO updateDTO = new TicketUpdateDTO();
+        updateDTO.setTitle("Updated Title");
+        updateDTO.setDescription("Updated Description");
+        updateDTO.setCategory("Software");
+        updateDTO.setPriority(TicketPriority.HIGH);
+
+        mockMvc.perform(put("/api/tickets/" + ticket.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(updateDTO)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.title", is("Updated Title")))
+                .andExpect(jsonPath("$.description", is("Updated Description")))
+                .andExpect(jsonPath("$.category", is("Software")))
+                .andExpect(jsonPath("$.priority", is("HIGH")))
+                .andExpect(jsonPath("$.status", is("ASSIGNED"))); // Status preserved
+    }
+
+    @Test
+    void updateTicket_MissingRequiredFields_ReturnsBadRequest() throws Exception {
+        Ticket ticket = new Ticket();
+        ticket.setTitle("Original Title");
+        ticket.setDescription("Original Description");
+        ticket.setCategory("Hardware");
+        ticket.setStatus(TicketStatus.OPEN);
+        ticket = ticketRepository.save(ticket);
+
+        TicketUpdateDTO updateDTO = new TicketUpdateDTO();
+        updateDTO.setTitle(""); // Invalid
+
+        mockMvc.perform(put("/api/tickets/" + ticket.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(updateDTO)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.title", notNullValue()))
+                .andExpect(jsonPath("$.description", notNullValue()))
+                .andExpect(jsonPath("$.category", notNullValue()));
+    }
+
+    // --- STATUS UPDATE (PATCH) ---
 
     @Test
     void updateTicketStatus_ValidTransition_ReturnsUpdatedTicket() throws Exception {

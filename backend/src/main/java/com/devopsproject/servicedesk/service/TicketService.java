@@ -1,5 +1,6 @@
 package com.devopsproject.servicedesk.service;
 
+import com.devopsproject.servicedesk.dto.TicketUpdateDTO;
 import com.devopsproject.servicedesk.exception.InvalidStatusTransitionException;
 import com.devopsproject.servicedesk.exception.ResourceNotFoundException;
 import com.devopsproject.servicedesk.model.Ticket;
@@ -9,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class TicketService {
@@ -39,16 +39,16 @@ public class TicketService {
         return ticketRepository.searchTickets(keyword, status, category);
     }
 
-    public Ticket updateTicket(Long id, Ticket ticketDetails) {
+    public Ticket updateTicket(Long id, TicketUpdateDTO dto) {
         Ticket existingTicket = getTicketById(id);
 
         // Update basic fields. DO NOT update status here (must use dedicated status endpoint)
-        existingTicket.setTitle(ticketDetails.getTitle());
-        existingTicket.setDescription(ticketDetails.getDescription());
-        existingTicket.setCategory(ticketDetails.getCategory());
-        existingTicket.setPriority(ticketDetails.getPriority());
-        existingTicket.setAssignedTo(ticketDetails.getAssignedTo());
-        existingTicket.setResolutionNotes(ticketDetails.getResolutionNotes());
+        existingTicket.setTitle(dto.getTitle());
+        existingTicket.setDescription(dto.getDescription());
+        existingTicket.setCategory(dto.getCategory());
+        existingTicket.setPriority(dto.getPriority());
+        existingTicket.setAssignedTo(dto.getAssignedTo());
+        existingTicket.setResolutionNotes(dto.getResolutionNotes());
 
         return ticketRepository.save(existingTicket);
     }
