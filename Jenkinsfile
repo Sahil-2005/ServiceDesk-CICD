@@ -41,12 +41,12 @@ pipeline {
         stage('E2E UI Tests') {
             environment {
                 EDGEDRIVER_PATH = 'C:/tools/webdriver/msedgedriver.exe'
+                PYTHON_EXE = 'C:/Users/sahil/AppData/Local/Programs/Python/Python311/python.exe'
             }
             steps {
                 bat '''
-                    python -m venv venv
-                    call venv/Scripts/activate.bat
-                    pip install -r tests/ui/requirements.txt
+                    "%PYTHON_EXE%" -m venv venv
+                    venv\\Scripts\\python.exe -m pip install -r tests\\ui\\requirements.txt
                 '''
                 dir('backend') {
                     bat '''
@@ -65,8 +65,7 @@ pipeline {
                     powershell -Command "$retry = 0; Write-Host 'Waiting for Frontend (5173)...'; while($true) { try { $response = Invoke-WebRequest -Uri 'http://localhost:5173' -UseBasicParsing -ErrorAction Stop; if ($response.StatusCode -eq 200) { Write-Host 'Frontend ready.'; break } } catch { }; if($retry -gt 30) { Write-Host 'Frontend startup logs:'; Get-Content frontend/frontend-startup.log; throw 'Frontend failed to start' }; $retry++; Start-Sleep 2 }"
                 '''
                 bat '''
-                    call venv/Scripts/activate.bat
-                    pytest tests/ui/test_ui.py --junitxml=tests/ui/results.xml
+                    venv\\Scripts\\python.exe -m pytest tests\\ui\\test_ui.py --junitxml=tests\\ui\\results.xml
                 '''
             }
             post {
