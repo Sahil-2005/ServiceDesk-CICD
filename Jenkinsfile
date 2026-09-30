@@ -46,7 +46,7 @@ pipeline {
             steps {
                 bat '''
                     "%PYTHON_EXE%" -m venv venv
-                    venv\Scripts\python.exe -m pip install -r tests\ui\requirements.txt
+                    venv\\Scripts\\python.exe -m pip install -r tests\\ui\\requirements.txt
                 '''
                 dir('backend') {
                     bat '''
@@ -70,7 +70,7 @@ pipeline {
                     "%PYTHON_EXE%" --version
                 '''
                 bat '''
-                    venv\Scripts\python.exe -m pytest tests\ui\test_ui.py --junitxml=tests\ui\results.xml
+                    venv\\Scripts\\python.exe -m pytest tests\\ui\\test_ui.py --junitxml=tests\\ui\\results.xml
                 '''
             }
             post {
