@@ -24,6 +24,8 @@ def driver():
     options.add_argument("--window-size=1920,1080")
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
+    # Set an explicit, writable user data directory for LocalSystem
+    options.add_argument(f"--user-data-dir={os.path.join(os.getcwd(), 'edge-profile')}")
     
     try:
         service = Service(executable_path=EDGEDRIVER_PATH)
