@@ -66,7 +66,7 @@ pipeline {
                     powershell -Command "$retry = 0; Write-Host 'Waiting for Frontend (5173)...'; while($true) { try { $response = Invoke-WebRequest -Uri 'http://localhost:5173' -UseBasicParsing -ErrorAction Stop; if ($response.StatusCode -eq 200) { Write-Host 'Frontend ready.'; break } } catch { }; if($retry -gt 30) { Write-Host 'Frontend startup logs:'; Get-Content frontend/frontend-startup.log; throw 'Frontend failed to start' }; $retry++; Start-Sleep 2 }"
                 '''
                 bat '''
-                    powershell -Command "Write-Host 'Edge Version:'; (Get-Item 'C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe').VersionInfo.FileVersion; Write-Host 'EdgeDriver Version:'; & 'C:\tools\webdriver\msedgedriver.exe' --version"
+                    powershell -Command "Write-Host 'Edge Version:'; (Get-Item 'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe').VersionInfo.FileVersion; Write-Host 'EdgeDriver Version:'; & 'C:\\tools\\webdriver\\msedgedriver.exe' --version"
                     java -version
                     "%PYTHON_EXE%" --version
                 '''
