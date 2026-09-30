@@ -13,6 +13,13 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import com.devopsproject.servicedesk.security.JwtUtils;
+import com.devopsproject.servicedesk.security.UserDetailsServiceImpl;
+import com.devopsproject.servicedesk.security.UserDetailsImpl;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.mockito.Mockito;
+import java.util.List;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -34,9 +41,19 @@ public class TicketControllerIntegrationTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+    @MockBean
+    private JwtUtils jwtUtils;
+
+    @MockBean
+    private UserDetailsServiceImpl userDetailsService;
+
     @BeforeEach
     void setup() {
         ticketRepository.deleteAll();
+        UserDetailsImpl admin = new UserDetailsImpl(1L, "admin", "admin@test.com", "pass", List.of(new SimpleGrantedAuthority("ROLE_ADMIN")));
+        Mockito.when(jwtUtils.validateJwtToken("fake-token")).thenReturn(true);
+        Mockito.when(jwtUtils.getUserNameFromJwtToken("fake-token")).thenReturn("admin");
+        Mockito.when(userDetailsService.loadUserByUsername("admin")).thenReturn(admin);
     }
 
     // --- CREATE ---
@@ -51,6 +68,7 @@ public class TicketControllerIntegrationTest {
         ticket.setStatus(TicketStatus.OPEN);
 
         mockMvc.perform(post("/api/tickets")
+                .header("Authorization", "Bearer fake-token")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(ticket)))
                 .andExpect(status().isCreated())
@@ -65,6 +83,7 @@ public class TicketControllerIntegrationTest {
         ticket.setTitle(""); // Invalid, should not be blank
 
         mockMvc.perform(post("/api/tickets")
+                .header("Authorization", "Bearer fake-token")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(ticket)))
                 .andExpect(status().isBadRequest())
@@ -84,14 +103,16 @@ public class TicketControllerIntegrationTest {
         ticket.setStatus(TicketStatus.OPEN);
         ticket = ticketRepository.save(ticket);
 
-        mockMvc.perform(get("/api/tickets/" + ticket.getId()))
+        mockMvc.perform(get("/api/tickets/" + ticket.getId())
+                .header("Authorization", "Bearer fake-token"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.title", is("Hardware Issue")));
     }
 
     @Test
     void getTicket_NonExistingId_ReturnsNotFound() throws Exception {
-        mockMvc.perform(get("/api/tickets/999"))
+        mockMvc.perform(get("/api/tickets/999")
+                .header("Authorization", "Bearer fake-token"))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.error", is("Not Found")));
     }
@@ -117,6 +138,7 @@ public class TicketControllerIntegrationTest {
         updateDTO.setPriority(TicketPriority.HIGH);
 
         mockMvc.perform(put("/api/tickets/" + ticket.getId())
+                .header("Authorization", "Bearer fake-token")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(updateDTO)))
                 .andExpect(status().isOk())
@@ -140,6 +162,7 @@ public class TicketControllerIntegrationTest {
         updateDTO.setTitle(""); // Invalid
 
         mockMvc.perform(put("/api/tickets/" + ticket.getId())
+                .header("Authorization", "Bearer fake-token")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(updateDTO)))
                 .andExpect(status().isBadRequest())
@@ -163,6 +186,7 @@ public class TicketControllerIntegrationTest {
         payload.put("status", "ASSIGNED");
 
         mockMvc.perform(patch("/api/tickets/" + ticket.getId() + "/status")
+                .header("Authorization", "Bearer fake-token")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(payload)))
                 .andExpect(status().isOk())
@@ -182,6 +206,7 @@ public class TicketControllerIntegrationTest {
         payload.put("status", "RESOLVED");
 
         mockMvc.perform(patch("/api/tickets/" + ticket.getId() + "/status")
+                .header("Authorization", "Bearer fake-token")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(payload)))
                 .andExpect(status().isBadRequest())
