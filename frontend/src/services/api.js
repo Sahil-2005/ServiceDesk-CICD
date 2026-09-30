@@ -9,6 +9,22 @@ const api = axios.create({
   },
 });
 
+api.interceptors.request.use(
+  (config) => {
+    const userStr = localStorage.getItem('user');
+    if (userStr) {
+      const user = JSON.parse(userStr);
+      if (user.accessToken) {
+        config.headers['Authorization'] = 'Bearer ' + user.accessToken;
+      }
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
 export const ticketService = {
   getAll: (params = {}) => api.get('/tickets', { params }),
 

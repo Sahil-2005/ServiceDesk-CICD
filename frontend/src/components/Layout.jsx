@@ -1,5 +1,6 @@
-import { NavLink, Outlet } from 'react-router-dom';
-import { useState } from 'react';
+import { NavLink, Outlet, Navigate, useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import AuthService from '../services/AuthService';
 
 const navItems = [
   { to: '/', label: 'Dashboard', icon: DashboardIcon },
@@ -41,6 +42,17 @@ function MenuIcon() {
 
 export default function Layout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [user, setUser] = useState(AuthService.getCurrentUser());
+  const navigate = useNavigate();
+
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+
+  const handleLogout = () => {
+    AuthService.logout();
+    navigate('/login');
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 flex">
@@ -108,11 +120,19 @@ export default function Layout() {
             <MenuIcon />
           </button>
           <div className="flex-1" />
-          <div className="flex items-center gap-2 text-sm text-gray-500">
-            <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-semibold">
-              A
+          <div className="flex items-center gap-4 text-sm text-gray-500">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-semibold">
+                {user.username.charAt(0).toUpperCase()}
+              </div>
+              <span className="hidden sm:inline font-medium text-gray-700">{user.username}</span>
             </div>
-            <span className="hidden sm:inline font-medium text-gray-700">Admin</span>
+            <button 
+              onClick={handleLogout}
+              className="text-gray-500 hover:text-red-500 transition-colors font-medium text-sm border border-gray-200 hover:border-red-200 px-3 py-1.5 rounded-lg"
+            >
+              Logout
+            </button>
           </div>
         </header>
 

@@ -26,7 +26,6 @@ public class Ticket {
     @Enumerated(EnumType.STRING)
     private TicketPriority priority;
 
-    @NotNull(message = "Status is required")
     @Enumerated(EnumType.STRING)
     private TicketStatus status;
 

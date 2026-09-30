@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ticketService } from '../services/api.js';
+import AuthService from '../services/AuthService.js';
 import { StatusBadge, Spinner } from '../components/ui.jsx';
 
 const statusOrder = ['OPEN', 'ASSIGNED', 'IN_PROGRESS', 'RESOLVED', 'CLOSED'];
@@ -17,6 +18,9 @@ export default function Dashboard() {
   const [tickets, setTickets] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const currentUser = AuthService.getCurrentUser();
+  const isAdminOrAgent = currentUser?.roles?.some(r => r === 'ROLE_ADMIN' || r === 'ROLE_AGENT');
 
   useEffect(() => {
     ticketService.getAll()
@@ -54,7 +58,7 @@ export default function Dashboard() {
     <div>
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-        <p className="text-gray-500 mt-1">Overview of IT service desk tickets</p>
+        <p className="text-gray-500 mt-1">{isAdminOrAgent ? 'Overview of IT service desk tickets' : 'Overview of your support tickets'}</p>
       </div>
 
       {/* Status summary cards */}

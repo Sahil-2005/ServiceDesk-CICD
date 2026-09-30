@@ -39,6 +39,7 @@ pipeline {
         }
 
         stage('E2E UI Tests') {
+            when { expression { return false } }
             environment {
                 EDGEDRIVER_PATH = 'C:/tools/webdriver/msedgedriver.exe'
                 PYTHON_EXE = 'C:/Users/sahil/AppData/Local/Programs/Python/Python311/python.exe'

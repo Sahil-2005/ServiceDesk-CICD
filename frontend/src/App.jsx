@@ -5,11 +5,15 @@ import TicketList from './pages/TicketList.jsx';
 import TicketDetail from './pages/TicketDetail.jsx';
 import TicketCreate from './pages/TicketCreate.jsx';
 import TicketEdit from './pages/TicketEdit.jsx';
+import Login from './pages/Login.jsx';
+import Register from './pages/Register.jsx';
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
         <Route path="/" element={<Layout />}>
           <Route index element={<Dashboard />} />
           <Route path="tickets" element={<TicketList />} />

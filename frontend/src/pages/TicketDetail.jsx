@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { ticketService } from '../services/api.js';
+import AuthService from '../services/AuthService.js';
 import { StatusBadge, PriorityBadge, Spinner, Toast } from '../components/ui.jsx';
 
 const statusTransitions = {
@@ -21,6 +22,9 @@ export default function TicketDetail() {
   const [statusUpdating, setStatusUpdating] = useState(false);
   const [showResolutionInput, setShowResolutionInput] = useState(false);
   const [resolutionNotes, setResolutionNotes] = useState('');
+
+  const currentUser = AuthService.getCurrentUser();
+  const isAdminOrAgent = currentUser?.roles?.some(r => r === 'ROLE_ADMIN' || r === 'ROLE_AGENT');
 
   useEffect(() => {
     ticketService.getById(id)
@@ -130,6 +134,7 @@ export default function TicketDetail() {
           </div>
 
           {/* Status Actions */}
+          {isAdminOrAgent && (
           <div className="bg-white rounded-xl border border-gray-200 p-6">
             <h3 className="text-sm font-semibold text-gray-600 uppercase tracking-wider mb-4">Update Status</h3>
 
@@ -175,6 +180,7 @@ export default function TicketDetail() {
               <p className="text-gray-500 text-sm">No status transitions available</p>
             )}
           </div>
+          )}
         </div>
 
         {/* Sidebar details */}
