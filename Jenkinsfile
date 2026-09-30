@@ -46,7 +46,7 @@ pipeline {
             steps {
                 bat '''
                     "%PYTHON_EXE%" -m venv venv
-                    venv\\Scripts\\python.exe -m pip install -r tests\\ui\\requirements.txt
+                    venv\Scripts\python.exe -m pip install -r tests\ui\requirements.txt
                 '''
                 dir('backend') {
                     bat '''
@@ -65,7 +65,12 @@ pipeline {
                     powershell -Command "$retry = 0; Write-Host 'Waiting for Frontend (5173)...'; while($true) { try { $response = Invoke-WebRequest -Uri 'http://localhost:5173' -UseBasicParsing -ErrorAction Stop; if ($response.StatusCode -eq 200) { Write-Host 'Frontend ready.'; break } } catch { }; if($retry -gt 30) { Write-Host 'Frontend startup logs:'; Get-Content frontend/frontend-startup.log; throw 'Frontend failed to start' }; $retry++; Start-Sleep 2 }"
                 '''
                 bat '''
-                    venv\\Scripts\\python.exe -m pytest tests\\ui\\test_ui.py --junitxml=tests\\ui\\results.xml
+                    powershell -Command "Write-Host 'Edge Version:'; (Get-Item 'C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe').VersionInfo.FileVersion; Write-Host 'EdgeDriver Version:'; & 'C:\tools\webdriver\msedgedriver.exe' --version"
+                    java -version
+                    "%PYTHON_EXE%" --version
+                '''
+                bat '''
+                    venv\Scripts\python.exe -m pytest tests\ui\test_ui.py --junitxml=tests\ui\results.xml
                 '''
             }
             post {
@@ -91,6 +96,7 @@ pipeline {
                     }
                     archiveArtifacts artifacts: 'tests/ui/*.png', allowEmptyArchive: true, fingerprint: true
                     archiveArtifacts artifacts: 'backend/backend-startup.log, frontend/frontend-startup.log', allowEmptyArchive: true
+                    archiveArtifacts artifacts: 'msedgedriver.log', allowEmptyArchive: true
                 }
             }
         }

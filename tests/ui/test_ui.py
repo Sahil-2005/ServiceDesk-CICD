@@ -1,4 +1,6 @@
 import os
+import shutil
+import tempfile
 import pytest
 from selenium import webdriver
 from selenium.webdriver.edge.service import Service
@@ -18,21 +20,24 @@ def driver():
     if not os.path.exists(EDGEDRIVER_PATH):
         pytest.fail(f"EdgeDriver executable not found at: {EDGEDRIVER_PATH}")
         
+    # Create unique temp user data dir to avoid LocalSystem profile access crashes
+    user_data_dir = tempfile.mkdtemp(prefix="servicedesk-edge-")
+
     options = Options()
+    # Explicitly set the binary location
+    options.binary_location = r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe"
+
     options.add_argument("--headless")
     options.add_argument("--disable-gpu")
     options.add_argument("--window-size=1920,1080")
-    options.add_argument("--no-sandbox")
-    options.add_argument("--disable-dev-shm-usage")
-    options.add_argument("--disable-extensions")
-    options.add_argument("--remote-debugging-port=9222")
-    # Set an explicit, writable user data directory for LocalSystem
-    options.add_argument(f"--user-data-dir={os.path.join(os.getcwd(), 'edge-profile')}")
+    options.add_argument(f"--user-data-dir={user_data_dir}")
     
     try:
-        service = Service(executable_path=EDGEDRIVER_PATH)
+        # Enable driver logging to a workspace file for Jenkins archiving
+        service = Service(executable_path=EDGEDRIVER_PATH, log_output="msedgedriver.log")
         driver_instance = webdriver.Edge(service=service, options=options)
     except Exception as e:
+        shutil.rmtree(user_data_dir, ignore_errors=True)
         pytest.fail(f"Failed to start Edge browser with driver at {EDGEDRIVER_PATH}. Error: {str(e)}")
         
     driver_instance.implicitly_wait(5)
@@ -41,6 +46,7 @@ def driver():
         yield driver_instance
     finally:
         driver_instance.quit()
+        shutil.rmtree(user_data_dir, ignore_errors=True)
 
 @pytest.hookimpl(tryfirst=True, hookwrapper=True)
 def pytest_runtest_makereport(item, call):
