@@ -22,6 +22,8 @@ def driver():
     options.add_argument("--headless=new")
     options.add_argument("--disable-gpu")
     options.add_argument("--window-size=1920,1080")
+    options.add_argument("--no-sandbox")
+    options.add_argument("--disable-dev-shm-usage")
     
     try:
         service = Service(executable_path=EDGEDRIVER_PATH)
