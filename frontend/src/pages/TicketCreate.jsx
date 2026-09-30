@@ -59,18 +59,18 @@ export default function TicketCreate() {
     <div>
       {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
 
-      <div className="flex items-center gap-2 text-sm text-gray-500 mb-6">
-        <Link to="/tickets" className="hover:text-indigo-600 transition-colors">Tickets</Link>
+      <div className="flex items-center gap-2 text-sm text-black mb-6 font-bold uppercase tracking-wider animate-slide-up">
+        <Link to="/tickets" className="hover:underline">Tickets</Link>
         <span>/</span>
-        <span className="text-gray-900 font-medium">New Ticket</span>
+        <span className="text-accent-500 font-extrabold">New Ticket</span>
       </div>
 
-      <div className="max-w-2xl">
-        <h1 className="text-2xl font-bold text-gray-900 mb-6">Create New Ticket</h1>
+      <div className="max-w-2xl animate-slide-up" style={{ animationDelay: '100ms' }}>
+        <h1 className="text-4xl font-extrabold text-black mb-8 uppercase tracking-tight">Create New Ticket</h1>
 
-        <form onSubmit={handleSubmit} className="bg-white rounded-xl border border-gray-200 p-6 space-y-5">
+        <form onSubmit={handleSubmit} className="bg-white rounded-xl border-[3px] border-black p-8 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] space-y-6">
           <div>
-            <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1.5">
+            <label htmlFor="title" className="block text-sm font-extrabold text-black uppercase tracking-wider mb-2">
               Title <span className="text-red-500">*</span>
             </label>
             <input
@@ -80,15 +80,15 @@ export default function TicketCreate() {
               value={form.title}
               onChange={handleChange}
               placeholder="Brief summary of the issue"
-              className={`w-full px-3 py-2.5 border rounded-lg text-sm outline-none transition-colors ${
-                errors.title ? 'border-red-300 focus:ring-red-500 focus:border-red-500' : 'border-gray-300 focus:ring-indigo-500 focus:border-indigo-500'
-              } focus:ring-2`}
+              className={`w-full px-4 py-3 border-2 border-black rounded bg-white text-black font-bold outline-none transition-shadow focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] ${
+                errors.title ? 'bg-red-50' : ''
+              }`}
             />
-            {errors.title && <p className="text-red-500 text-xs mt-1">{errors.title}</p>}
+            {errors.title && <p className="text-red-600 text-sm font-bold mt-2 bg-red-100 border-2 border-black p-2 rounded shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] inline-block">{errors.title}</p>}
           </div>
 
           <div>
-            <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1.5">
+            <label htmlFor="description" className="block text-sm font-extrabold text-black uppercase tracking-wider mb-2">
               Description <span className="text-red-500">*</span>
             </label>
             <textarea
@@ -97,17 +97,17 @@ export default function TicketCreate() {
               value={form.description}
               onChange={handleChange}
               placeholder="Describe the issue in detail"
-              rows={4}
-              className={`w-full px-3 py-2.5 border rounded-lg text-sm outline-none resize-none transition-colors ${
-                errors.description ? 'border-red-300 focus:ring-red-500 focus:border-red-500' : 'border-gray-300 focus:ring-indigo-500 focus:border-indigo-500'
-              } focus:ring-2`}
+              rows={5}
+              className={`w-full px-4 py-3 border-2 border-black rounded bg-white text-black font-bold outline-none resize-none transition-shadow focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] ${
+                errors.description ? 'bg-red-50' : ''
+              }`}
             />
-            {errors.description && <p className="text-red-500 text-xs mt-1">{errors.description}</p>}
+            {errors.description && <p className="text-red-600 text-sm font-bold mt-2 bg-red-100 border-2 border-black p-2 rounded shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] inline-block">{errors.description}</p>}
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <div>
-              <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-1.5">
+              <label htmlFor="category" className="block text-sm font-extrabold text-black uppercase tracking-wider mb-2">
                 Category <span className="text-red-500">*</span>
               </label>
               <select
@@ -115,9 +115,9 @@ export default function TicketCreate() {
                 name="category"
                 value={form.category}
                 onChange={handleChange}
-                className={`w-full px-3 py-2.5 border rounded-lg text-sm outline-none bg-white transition-colors ${
-                  errors.category ? 'border-red-300 focus:ring-red-500 focus:border-red-500' : 'border-gray-300 focus:ring-indigo-500 focus:border-indigo-500'
-                } focus:ring-2`}
+                className={`w-full px-4 py-3 border-2 border-black rounded bg-white text-black font-bold outline-none transition-shadow focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] ${
+                  errors.category ? 'bg-red-50' : ''
+                }`}
               >
                 <option value="">Select category</option>
                 <option value="Hardware">Hardware</option>
@@ -126,17 +126,17 @@ export default function TicketCreate() {
                 <option value="Account">Account</option>
                 <option value="Other">Other</option>
               </select>
-              {errors.category && <p className="text-red-500 text-xs mt-1">{errors.category}</p>}
+              {errors.category && <p className="text-red-600 text-sm font-bold mt-2 bg-red-100 border-2 border-black p-2 rounded shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] inline-block">{errors.category}</p>}
             </div>
 
             <div>
-              <label htmlFor="priority" className="block text-sm font-medium text-gray-700 mb-1.5">Priority</label>
+              <label htmlFor="priority" className="block text-sm font-extrabold text-black uppercase tracking-wider mb-2">Priority</label>
               <select
                 id="priority"
                 name="priority"
                 value={form.priority}
                 onChange={handleChange}
-                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm outline-none bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+                className="w-full px-4 py-3 border-2 border-black rounded bg-white text-black font-bold outline-none transition-shadow focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
               >
                 <option value="LOW">Low</option>
                 <option value="MEDIUM">Medium</option>
@@ -145,19 +145,17 @@ export default function TicketCreate() {
             </div>
           </div>
 
-
-
-          <div className="flex gap-3 pt-2">
+          <div className="flex gap-4 pt-6 border-t-[3px] border-black">
             <button
               type="submit"
               disabled={submitting}
-              className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2.5 rounded-lg text-sm font-medium transition-colors disabled:opacity-50 shadow-sm"
+              className="bg-accent-500 hover:bg-accent-400 text-white px-8 py-3 rounded border-2 border-black font-extrabold uppercase tracking-wider transition-all disabled:opacity-50 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-0.5 hover:-translate-x-0.5 active:translate-y-1 active:translate-x-1 active:shadow-none"
             >
               {submitting ? 'Creating...' : 'Create Ticket'}
             </button>
             <Link
               to="/tickets"
-              className="text-gray-600 hover:text-gray-800 px-4 py-2.5 rounded-lg text-sm font-medium border border-gray-300 hover:bg-gray-50 transition-colors"
+              className="bg-white hover:bg-gray-100 text-black px-6 py-3 rounded border-2 border-black font-extrabold uppercase tracking-wider transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-0.5 hover:-translate-x-0.5 active:translate-y-1 active:translate-x-1 active:shadow-none inline-flex items-center"
             >
               Cancel
             </Link>

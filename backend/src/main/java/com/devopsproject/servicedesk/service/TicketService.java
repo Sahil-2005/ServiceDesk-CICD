@@ -101,4 +101,9 @@ public class TicketService {
             throw new InvalidStatusTransitionException("Invalid status transition from " + currentStatus + " to " + newStatus);
         }
     }
+
+    public void deleteTicket(Long id) {
+        Ticket existingTicket = getTicketById(id);
+        ticketRepository.delete(existingTicket);
+    }
 }

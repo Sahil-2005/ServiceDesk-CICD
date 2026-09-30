@@ -30,27 +30,23 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-900 via-purple-900 to-black overflow-hidden relative">
-      {/* Decorative Blobs */}
-      <div className="absolute top-0 left-0 w-96 h-96 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob"></div>
-      <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-500 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000"></div>
-      <div className="absolute -bottom-8 left-20 w-96 h-96 bg-pink-500 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-4000"></div>
-
-      <div className="relative z-10 w-full max-w-md p-10 bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl shadow-[0_8px_32px_0_rgba(31,38,135,0.37)]">
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500 tracking-tight">
-            Welcome Back
-          </h1>
-          <p className="text-gray-300 mt-2 font-medium">Log in to your ServiceDesk portal</p>
+    <div className="min-h-screen flex items-center justify-center bg-base-100 px-4">
+      <div className="w-full max-w-md bg-white border-[3px] border-black rounded-xl p-8 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+        <div className="mb-8">
+          <Link to="/" className="inline-flex items-center justify-center w-8 h-8 border-2 border-black rounded bg-white hover:bg-gray-100 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] font-bold text-lg mb-6 transition-transform hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-none">
+            &lt;
+          </Link>
+          <h1 className="text-3xl font-extrabold text-black mb-2">Sign In</h1>
+          <p className="text-black font-medium">Welcome back and enjoy</p>
         </div>
 
         <form onSubmit={handleLogin} className="space-y-6">
           <div>
-            <label className="block text-sm font-medium text-gray-200 mb-1">Username</label>
+            <label className="block text-sm font-bold text-black mb-2">Username</label>
             <input
               type="text"
-              className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300"
-              placeholder="Enter your username"
+              className="w-full px-4 py-3 border-2 border-black rounded-md text-black placeholder-gray-500 focus:outline-none focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-shadow"
+              placeholder="your username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               required
@@ -58,46 +54,40 @@ const Login = () => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-200 mb-1">Password</label>
+            <label className="block text-sm font-bold text-black mb-2">Password</label>
             <input
               type="password"
-              className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300"
-              placeholder="••••••••"
+              className="w-full px-4 py-3 border-2 border-black rounded-md text-black placeholder-gray-500 focus:outline-none focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-shadow"
+              placeholder="your password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
             />
           </div>
 
+          <div className="flex justify-end">
+            <a href="#" className="text-sm font-bold text-black hover:underline">Forgot Password?</a>
+          </div>
+
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 px-4 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-bold rounded-xl shadow-lg hover:shadow-purple-500/30 transform hover:-translate-y-0.5 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full py-3 px-4 bg-accent-500 hover:bg-accent-400 text-white font-bold border-2 border-black rounded-md shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-y-1 active:translate-x-1 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {loading ? (
-              <span className="flex items-center justify-center">
-                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                Signing in...
-              </span>
-            ) : (
-              'Sign In'
-            )}
+            {loading ? 'Signing in...' : 'Sign In'}
           </button>
 
           {message && (
-            <div className="p-4 rounded-xl bg-red-500/20 border border-red-500/50 text-red-200 text-sm text-center">
+            <div className="p-4 bg-red-100 border-2 border-black text-black font-bold text-sm text-center shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
               {message}
             </div>
           )}
         </form>
 
-        <p className="mt-8 text-center text-gray-400">
+        <p className="mt-8 text-center text-black font-bold">
           Don't have an account?{' '}
-          <Link to="/register" className="font-semibold text-purple-400 hover:text-purple-300 transition-colors">
-            Sign up now
+          <Link to="/register" className="text-accent-500 hover:underline">
+            Sign up
           </Link>
         </p>
       </div>

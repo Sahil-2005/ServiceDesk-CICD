@@ -7,11 +7,11 @@ import { StatusBadge, Spinner } from '../components/ui.jsx';
 const statusOrder = ['OPEN', 'ASSIGNED', 'IN_PROGRESS', 'RESOLVED', 'CLOSED'];
 
 const cardConfig = {
-  OPEN: { gradient: 'from-blue-500 to-blue-600', icon: '📋' },
-  ASSIGNED: { gradient: 'from-amber-500 to-amber-600', icon: '👤' },
-  IN_PROGRESS: { gradient: 'from-purple-500 to-purple-600', icon: '⚙️' },
-  RESOLVED: { gradient: 'from-green-500 to-green-600', icon: '✅' },
-  CLOSED: { gradient: 'from-gray-500 to-gray-600', icon: '🔒' },
+  OPEN: { bg: 'bg-blue-100', icon: '📋' },
+  ASSIGNED: { bg: 'bg-amber-100', icon: '👤' },
+  IN_PROGRESS: { bg: 'bg-purple-100', icon: '⚙️' },
+  RESOLVED: { bg: 'bg-green-100', icon: '✅' },
+  CLOSED: { bg: 'bg-gray-200', icon: '🔒' },
 };
 
 export default function Dashboard() {
@@ -38,7 +38,7 @@ export default function Dashboard() {
 
   if (error) {
     return (
-      <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+      <div className="bg-red-100 border-2 border-black text-black font-bold px-4 py-3 rounded-lg shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
         {error}
       </div>
     );
@@ -56,40 +56,40 @@ export default function Dashboard() {
 
   return (
     <div>
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-        <p className="text-gray-500 mt-1">{isAdminOrAgent ? 'Overview of IT service desk tickets' : 'Overview of your support tickets'}</p>
+      <div className="mb-10 animate-slide-up">
+        <h1 className="text-4xl font-extrabold text-black uppercase tracking-tight">Dashboard</h1>
+        <p className="text-black font-bold mt-2 border-l-4 border-black pl-3">{isAdminOrAgent ? 'Overview of IT service desk tickets' : 'Overview of your support tickets'}</p>
       </div>
 
       {/* Status summary cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
-        {statusOrder.map(status => {
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-5 mb-10">
+        {statusOrder.map((status, index) => {
           const config = cardConfig[status];
           return (
             <Link
               key={status}
               to={`/tickets?status=${status}`}
-              className="group relative overflow-hidden rounded-xl bg-white border border-gray-200 p-5 hover:shadow-lg transition-all duration-200 hover:-translate-y-0.5"
+              className={`group relative overflow-hidden rounded-xl border-[3px] border-black p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all duration-200 hover:-translate-y-1 hover:-translate-x-1 animate-slide-up ${config.bg}`}
+              style={{ animationDelay: `${index * 50}ms` }}
             >
-              <div className={`absolute top-0 left-0 w-full h-1 bg-gradient-to-r ${config.gradient}`} />
-              <div className="text-2xl mb-2">{config.icon}</div>
-              <p className="text-3xl font-bold text-gray-900">{counts[status]}</p>
-              <p className="text-sm text-gray-500 mt-1 capitalize">{status.replace('_', ' ').toLowerCase()}</p>
+              <div className="text-3xl mb-3">{config.icon}</div>
+              <p className="text-4xl font-extrabold text-black tracking-tight">{counts[status]}</p>
+              <p className="text-sm font-bold text-black mt-1 uppercase">{status.replace('_', ' ')}</p>
             </Link>
           );
         })}
       </div>
 
       {/* Total */}
-      <div className="bg-gradient-to-r from-indigo-600 to-indigo-700 rounded-xl p-6 mb-8 text-white">
-        <div className="flex items-center justify-between">
+      <div className="relative overflow-hidden bg-accent-500 border-[3px] border-black rounded-xl p-8 mb-10 text-white shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] animate-slide-up" style={{ animationDelay: '250ms' }}>
+        <div className="relative flex items-center justify-between z-10">
           <div>
-            <p className="text-indigo-200 text-sm font-medium">Total Tickets</p>
-            <p className="text-4xl font-bold mt-1">{tickets.length}</p>
+            <p className="text-white text-sm font-bold tracking-widest uppercase">Total Tickets</p>
+            <p className="text-6xl font-extrabold mt-2 tracking-tight">{tickets.length}</p>
           </div>
           <Link
             to="/tickets/new"
-            className="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors backdrop-blur-sm"
+            className="bg-white hover:bg-gray-100 text-black px-6 py-3 border-[3px] border-black rounded-lg text-sm font-bold transition-all duration-200 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:-translate-x-1"
           >
             + New Ticket
           </Link>
@@ -97,37 +97,37 @@ export default function Dashboard() {
       </div>
 
       {/* Recent tickets table */}
-      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-gray-900">Recent Tickets</h2>
-          <Link to="/tickets" className="text-sm text-indigo-600 hover:text-indigo-700 font-medium">
-            View all →
+      <div className="bg-white rounded-xl border-[3px] border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden animate-slide-up" style={{ animationDelay: '300ms' }}>
+        <div className="px-6 py-5 border-b-[3px] border-black flex items-center justify-between bg-yellow-100">
+          <h2 className="text-xl font-extrabold text-black uppercase">Recent Tickets</h2>
+          <Link to="/tickets" className="text-sm text-black border-2 border-black bg-white px-3 py-1 rounded font-bold shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-0.5 hover:-translate-x-0.5 transition-transform">
+            View all &rarr;
           </Link>
         </div>
         {recentTickets.length === 0 ? (
-          <div className="p-8 text-center text-gray-500">No tickets yet</div>
+          <div className="p-8 text-center text-black font-bold">No tickets yet</div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="bg-gray-50 text-left">
-                  <th className="px-6 py-3 font-semibold text-gray-600">ID</th>
-                  <th className="px-6 py-3 font-semibold text-gray-600">Title</th>
-                  <th className="px-6 py-3 font-semibold text-gray-600">Category</th>
-                  <th className="px-6 py-3 font-semibold text-gray-600">Status</th>
+                <tr className="bg-gray-100 text-left border-b-2 border-black">
+                  <th className="px-6 py-4 font-bold text-black uppercase tracking-wider">ID</th>
+                  <th className="px-6 py-4 font-bold text-black uppercase tracking-wider">Title</th>
+                  <th className="px-6 py-4 font-bold text-black uppercase tracking-wider">Category</th>
+                  <th className="px-6 py-4 font-bold text-black uppercase tracking-wider">Status</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
+              <tbody className="divide-y-2 divide-black">
                 {recentTickets.map(ticket => (
-                  <tr key={ticket.id} className="hover:bg-gray-50 transition-colors">
-                    <td className="px-6 py-3 text-gray-500 font-mono text-xs">#{ticket.id}</td>
-                    <td className="px-6 py-3">
-                      <Link to={`/tickets/${ticket.id}`} className="text-gray-900 font-medium hover:text-indigo-600 transition-colors">
+                  <tr key={ticket.id} className="hover:bg-gray-50 transition-colors group">
+                    <td className="px-6 py-4 text-black font-mono font-bold">#{ticket.id}</td>
+                    <td className="px-6 py-4">
+                      <Link to={`/tickets/${ticket.id}`} className="text-black font-bold hover:text-accent-500 hover:underline transition-colors text-base">
                         {ticket.title}
                       </Link>
                     </td>
-                    <td className="px-6 py-3 text-gray-500">{ticket.category}</td>
-                    <td className="px-6 py-3"><StatusBadge status={ticket.status} /></td>
+                    <td className="px-6 py-4 text-black font-semibold">{ticket.category}</td>
+                    <td className="px-6 py-4"><StatusBadge status={ticket.status} /></td>
                   </tr>
                 ))}
               </tbody>

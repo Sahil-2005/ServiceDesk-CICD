@@ -41,6 +41,8 @@ export const ticketService = {
     }
     return api.patch(`/tickets/${id}/status`, payload);
   },
+
+  delete: (id) => api.delete(`/tickets/${id}`),
 };
 
 export default api;
