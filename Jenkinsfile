@@ -100,6 +100,8 @@ pipeline {
                     archiveArtifacts artifacts: 'msedgedriver.log', allowEmptyArchive: true
                 }
             }
+        }
+
         stage('Docker Deploy') {
             steps {
                 bat 'docker-compose down'
