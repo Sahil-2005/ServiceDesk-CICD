@@ -1,0 +1,42 @@
+---
+- name: Automate ServiceDesk Server Setup and Application Prerequisites
+  hosts: app_servers
+  become: true
+
+  tasks:
+    - name: Update apt repository cache
+      ansible.builtin.apt:
+        update_cache: true
+        cache_valid_time: 3600
+
+    - name: Install core tools and application prerequisites
+      ansible.builtin.apt:
+        name:
+          - git
+          - openjdk-17-jdk
+          - maven
+          - curl
+          - ca-certificates
+        state: present
+
+    - name: Verify Git installation
+      ansible.builtin.command: git --version
+      register: git_version
+      changed_when: false
+
+    - name: Verify Java 17 installation
+      ansible.builtin.command: java -version
+      register: java_version
+      changed_when: false
+
+    - name: Verify Maven installation
+      ansible.builtin.command: mvn -version
+      register: mvn_version
+      changed_when: false
+
+    - name: Display verified prerequisite versions
+      ansible.builtin.debug:
+        msg:
+          - "Git: {{ git_version.stdout }}"
+          - "Java: {{ java_version.stderr_lines[0] }}"
+          - "Maven: {{ mvn_version.stdout_lines[0] }}"
